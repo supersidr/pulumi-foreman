@@ -1,0 +1,89 @@
+diff --git a/foreman/resource_foreman_subnet.go b/foreman/resource_foreman_subnet.go
+--- a/foreman/resource_foreman_subnet.go
++++ b/foreman/resource_foreman_subnet.go
+@@ -380,5 +380,17 @@ func resourceForemanSubnetDelete(ctx context.Context, d *schema.ResourceData, me
+ 
+ 	log.Debugf("ForemanSubnet: [%+v]", s)
+ 
++	// Foreman does not allow deleting a subnet while it is associated with
++	// domains. Explicitly clear those associations before deleting the subnet.
++	s.DomainIDs = []int{}
++	if _, updateErr := client.UpdateSubnet(ctx, s); updateErr != nil {
++		if checkErr := api.CheckDeleted(d, updateErr); checkErr != nil {
++			return diag.FromErr(fmt.Errorf("failed to detach subnet from domains: %w", checkErr))
++		}
++		if d.Id() == "" {
++			return nil
++		}
++	}
++
+ 	return diag.FromErr(api.CheckDeleted(d, client.DeleteSubnet(ctx, s.Id)))
+ }
+diff --git a/foreman/resource_foreman_subnet_test.go b/foreman/resource_foreman_subnet_test.go
+--- a/foreman/resource_foreman_subnet_test.go
++++ b/foreman/resource_foreman_subnet_test.go
+@@ -1,6 +1,7 @@
+ package foreman
+ 
+ import (
++	"context"
+ 	"encoding/json"
+ 	"math/rand"
+ 	"net/http"
+@@ -161,6 +162,56 @@ func TestSetResourceDataFromForemanSubnet_Value(t *testing.T) {
+ 
+ }
+ 
++func TestResourceForemanSubnetDeleteDetachesDomainsBeforeDelete(t *testing.T) {
++	obj := RandForemanSubnet()
++	obj.Id = 42
++	resourceData := MockForemanSubnetResourceData(ForemanSubnetToInstanceState(obj))
++	if err := resourceData.Set("domain_ids", []int{10, 20}); err != nil {
++		t.Fatalf("failed to set domain_ids: %s", err)
++	}
++
++	mux, server, client := NewForemanAPIAndClient(api.ClientCredentials{}, api.ClientConfig{})
++	defer server.Close()
++
++	var methods []string
++	mux.HandleFunc(SubnetsURI+"/"+strconv.Itoa(obj.Id), func(w http.ResponseWriter, r *http.Request) {
++		methods = append(methods, r.Method)
++
++		switch r.Method {
++		case http.MethodPut:
++			var payload struct {
++				Subnet struct {
++					DomainIDs []int `json:"domain_ids"`
++				} `json:"subnet"`
++			}
++			if err := json.NewDecoder(r.Body).Decode(&payload); err != nil {
++				t.Errorf("failed to decode subnet update payload: %s", err)
++				w.WriteHeader(http.StatusBadRequest)
++				return
++			}
++			if payload.Subnet.DomainIDs == nil || len(payload.Subnet.DomainIDs) != 0 {
++				t.Errorf("expected domain_ids to be an empty array, got: %#v", payload.Subnet.DomainIDs)
++			}
++			_, _ = w.Write([]byte(`{}`))
++		case http.MethodDelete:
++			_, _ = w.Write([]byte(`{}`))
++		default:
++			t.Errorf("unexpected method: %s", r.Method)
++			w.WriteHeader(http.StatusMethodNotAllowed)
++		}
++	})
++
++	diagnostics := resourceForemanSubnetDelete(context.Background(), resourceData, client)
++	if diagnostics.HasError() {
++		t.Fatalf("subnet deletion failed: %v", diagnostics)
++	}
++
++	expectedMethods := []string{http.MethodPut, http.MethodDelete}
++	if !reflect.DeepEqual(methods, expectedMethods) {
++		t.Fatalf("expected request sequence %v, got %v", expectedMethods, methods)
++	}
++}
++
+ // ----------------------------------------------------------------------------
+ // Test Cases for the Unit Test Framework
+ // ----------------------------------------------------------------------------
