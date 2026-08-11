@@ -140,6 +140,10 @@ if not MYPY:
         """
         Hypervisor specific interface options
         """
+        domain_id: NotRequired[pulumi.Input[int]]
+        """
+        ID of the domain to associate with this interface.
+        """
         id: NotRequired[pulumi.Input[int]]
         """
         Unique identifier for the interface.
@@ -202,6 +206,7 @@ class HostInterfacesAttributeArgs:
                  attached_to: Optional[pulumi.Input[str]] = None,
                  bmc_provider: Optional[pulumi.Input[str]] = None,
                  compute_attributes: Optional[pulumi.Input[Mapping[str, pulumi.Input[str]]]] = None,
+                 domain_id: Optional[pulumi.Input[int]] = None,
                  id: Optional[pulumi.Input[int]] = None,
                  identifier: Optional[pulumi.Input[str]] = None,
                  ip: Optional[pulumi.Input[str]] = None,
@@ -220,6 +225,7 @@ class HostInterfacesAttributeArgs:
         :param pulumi.Input[str] attached_to: Identifier of the interface to which this interface belongs.
         :param pulumi.Input[str] bmc_provider: Provider used for BMC/IMPI functionality. Values include: `"IPMI"`
         :param pulumi.Input[Mapping[str, pulumi.Input[str]]] compute_attributes: Hypervisor specific interface options
+        :param pulumi.Input[int] domain_id: ID of the domain to associate with this interface.
         :param pulumi.Input[int] id: Unique identifier for the interface.
         :param pulumi.Input[str] identifier: Identifier of this interface local to the host.
         :param pulumi.Input[str] ip: IP address associated with the interface.
@@ -242,6 +248,8 @@ class HostInterfacesAttributeArgs:
             pulumi.set(__self__, "bmc_provider", bmc_provider)
         if compute_attributes is not None:
             pulumi.set(__self__, "compute_attributes", compute_attributes)
+        if domain_id is not None:
+            pulumi.set(__self__, "domain_id", domain_id)
         if id is not None:
             pulumi.set(__self__, "id", id)
         if identifier is not None:
@@ -316,6 +324,18 @@ class HostInterfacesAttributeArgs:
     @compute_attributes.setter
     def compute_attributes(self, value: Optional[pulumi.Input[Mapping[str, pulumi.Input[str]]]]):
         pulumi.set(self, "compute_attributes", value)
+
+    @property
+    @pulumi.getter(name="domainId")
+    def domain_id(self) -> Optional[pulumi.Input[int]]:
+        """
+        ID of the domain to associate with this interface.
+        """
+        return pulumi.get(self, "domain_id")
+
+    @domain_id.setter
+    def domain_id(self, value: Optional[pulumi.Input[int]]):
+        pulumi.set(self, "domain_id", value)
 
     @property
     @pulumi.getter

@@ -1,0 +1,57 @@
+diff --git a/foreman/api/host.go b/foreman/api/host.go
+index 8744774..64a99a8 100644
+--- a/foreman/api/host.go
++++ b/foreman/api/host.go
+@@ -143,6 +143,7 @@ func (fh *ForemanHost) isBuilt() bool {
+ type ForemanInterfacesAttribute struct {
+ 	Id         int    `json:"id,omitempty"`
+ 	SubnetId   int    `json:"subnet_id,omitempty"`
++	DomainId   int    `json:"domain_id,omitempty"`
+ 	Identifier string `json:"identifier"`
+ 	Name       string `json:"name"`
+ 	Username   string `json:"username,omitempty"`
+diff --git a/foreman/resource_foreman_host.go b/foreman/resource_foreman_host.go
+index 0cdb725..948e39f 100644
+--- a/foreman/resource_foreman_host.go
++++ b/foreman/resource_foreman_host.go
+@@ -755,6 +755,13 @@ func resourceForemanInterfacesAttributes() *schema.Resource {
+ 				ValidateFunc: validation.IntAtLeast(0),
+ 				Description:  "ID of the subnet to associate with this interface.",
+ 			},
++			"domain_id": {
++				Type:         schema.TypeInt,
++				Optional:     true,
++				Computed:     true,
++				ValidateFunc: validation.IntAtLeast(0),
++				Description:  "ID of the domain to associate with this interface.",
++			},
+ 			"identifier": {
+ 				Type:        schema.TypeString,
+ 				Optional:    true,
+@@ -1029,6 +1036,7 @@ func buildForemanInterfacesAttributes(d *schema.ResourceData) []api.ForemanInter
+ //   mac (string)
+ //   name (string)
+ //   subnet_id (int)
++//   domain_id (int)
+ //   identifier (string)
+ //   managed (bool)
+ //   provision (bool)
+@@ -1065,6 +1073,10 @@ func mapToForemanInterfacesAttribute(m map[string]interface{}) api.ForemanInterf
+ 		tempIntAttr.SubnetId = 0
+ 	}
+ 
++	if tempIntAttr.DomainId, ok = m["domain_id"].(int); !ok {
++		tempIntAttr.DomainId = 0
++	}
++
+ 	if tempIntAttr.MAC, ok = m["mac"].(string); !ok {
+ 		tempIntAttr.MAC = ""
+ 	}
+@@ -1244,6 +1256,7 @@ func setResourceDataFromForemanInterfacesAttributes(d *schema.ResourceData, fh *
+ 			"mac":          val.MAC,
+ 			"name":         val.Name,
+ 			"subnet_id":    val.SubnetId,
++			"domain_id":    val.DomainId,
+ 			"primary":      val.Primary,
+ 			"managed":      val.Managed,
+ 			"identifier":   val.Identifier,

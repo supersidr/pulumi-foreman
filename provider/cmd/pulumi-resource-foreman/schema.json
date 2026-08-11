@@ -180,6 +180,10 @@
                     },
                     "description": "Hypervisor specific interface options\n"
                 },
+                "domainId": {
+                    "type": "integer",
+                    "description": "ID of the domain to associate with this interface.\n"
+                },
                 "id": {
                     "type": "integer",
                     "description": "Unique identifier for the interface.\n"
@@ -238,6 +242,7 @@
             "language": {
                 "nodejs": {
                     "requiredOutputs": [
+                        "domainId",
                         "id",
                         "ip",
                         "mac",

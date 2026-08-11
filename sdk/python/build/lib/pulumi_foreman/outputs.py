@@ -115,6 +115,8 @@ class HostInterfacesAttribute(dict):
             suggest = "bmc_provider"
         elif key == "computeAttributes":
             suggest = "compute_attributes"
+        elif key == "domainId":
+            suggest = "domain_id"
         elif key == "subnetId":
             suggest = "subnet_id"
 
@@ -134,6 +136,7 @@ class HostInterfacesAttribute(dict):
                  attached_to: Optional[str] = None,
                  bmc_provider: Optional[str] = None,
                  compute_attributes: Optional[Mapping[str, str]] = None,
+                 domain_id: Optional[int] = None,
                  id: Optional[int] = None,
                  identifier: Optional[str] = None,
                  ip: Optional[str] = None,
@@ -152,6 +155,7 @@ class HostInterfacesAttribute(dict):
         :param str attached_to: Identifier of the interface to which this interface belongs.
         :param str bmc_provider: Provider used for BMC/IMPI functionality. Values include: `"IPMI"`
         :param Mapping[str, str] compute_attributes: Hypervisor specific interface options
+        :param int domain_id: ID of the domain to associate with this interface.
         :param int id: Unique identifier for the interface.
         :param str identifier: Identifier of this interface local to the host.
         :param str ip: IP address associated with the interface.
@@ -174,6 +178,8 @@ class HostInterfacesAttribute(dict):
             pulumi.set(__self__, "bmc_provider", bmc_provider)
         if compute_attributes is not None:
             pulumi.set(__self__, "compute_attributes", compute_attributes)
+        if domain_id is not None:
+            pulumi.set(__self__, "domain_id", domain_id)
         if id is not None:
             pulumi.set(__self__, "id", id)
         if identifier is not None:
@@ -232,6 +238,14 @@ class HostInterfacesAttribute(dict):
         Hypervisor specific interface options
         """
         return pulumi.get(self, "compute_attributes")
+
+    @property
+    @pulumi.getter(name="domainId")
+    def domain_id(self) -> Optional[int]:
+        """
+        ID of the domain to associate with this interface.
+        """
+        return pulumi.get(self, "domain_id")
 
     @property
     @pulumi.getter
