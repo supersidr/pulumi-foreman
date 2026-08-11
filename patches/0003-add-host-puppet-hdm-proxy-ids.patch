@@ -1,0 +1,116 @@
+diff --git a/foreman/api/host.go b/foreman/api/host.go
+index 5f0ec3c..8744774 100644
+--- a/foreman/api/host.go
++++ b/foreman/api/host.go
+@@ -83,6 +83,12 @@ type ForemanHost struct {
+ 	OrganizationName string `json:"organization_name,omitempty"`
+ 	// ID of the hostgroup to assign the host
+ 	HostgroupId *int `json:"hostgroup_id,omitempty"`
++	// ID of the smart proxy acting as the puppet proxy server for the host
++	PuppetProxyId *int `json:"puppet_proxy_id,omitempty"`
++	// ID of the smart proxy acting as the puppet CA for the host
++	PuppetCAProxyId *int `json:"puppet_ca_proxy_id,omitempty"`
++	// ID of the HDM smart proxy for the host (foreman_hdm plugin)
++	HdmProxyId *int `json:"hdm_proxy_id,omitempty"`
+ 	// ID of the architecture of this host
+ 	ArchitectureId *int `json:"architecture_id,omitempty"`
+ 	// Name of the architecture of this host
+diff --git a/foreman/resource_foreman_host.go b/foreman/resource_foreman_host.go
+index b168aad..0cdb725 100644
+--- a/foreman/resource_foreman_host.go
++++ b/foreman/resource_foreman_host.go
+@@ -203,6 +203,27 @@ func resourceForemanHostV0() *schema.Resource {
+ 				ValidateFunc: validation.IntAtLeast(0),
+ 				Description:  "ID of the environment to assign to the host.",
+ 			},
++			"puppet_proxy_id": {
++				Type:         schema.TypeInt,
++				Optional:     true,
++				Computed:     true,
++				ValidateFunc: validation.IntAtLeast(0),
++				Description:  "ID of the smart proxy acting as the puppet proxy server for the host.",
++			},
++			"puppet_ca_proxy_id": {
++				Type:         schema.TypeInt,
++				Optional:     true,
++				Computed:     true,
++				ValidateFunc: validation.IntAtLeast(0),
++				Description:  "ID of the smart proxy acting as the puppet CA for the host.",
++			},
++			"hdm_proxy_id": {
++				Type:         schema.TypeInt,
++				Optional:     true,
++				Computed:     true,
++				ValidateFunc: validation.IntAtLeast(0),
++				Description:  "ID of the HDM smart proxy for the host.",
++			},
+ 			"operatingsystem_id": {
+ 				Type:         schema.TypeInt,
+ 				Optional:     true,
+@@ -522,6 +543,27 @@ func resourceForemanHost() *schema.Resource {
+ 				ValidateFunc: validation.IntAtLeast(0),
+ 				Description:  "ID of the environment to assign to the host.",
+ 			},
++			"puppet_proxy_id": {
++				Type:         schema.TypeInt,
++				Optional:     true,
++				Computed:     true,
++				ValidateFunc: validation.IntAtLeast(0),
++				Description:  "ID of the smart proxy acting as the puppet proxy server for the host.",
++			},
++			"puppet_ca_proxy_id": {
++				Type:         schema.TypeInt,
++				Optional:     true,
++				Computed:     true,
++				ValidateFunc: validation.IntAtLeast(0),
++				Description:  "ID of the smart proxy acting as the puppet CA for the host.",
++			},
++			"hdm_proxy_id": {
++				Type:         schema.TypeInt,
++				Optional:     true,
++				Computed:     true,
++				ValidateFunc: validation.IntAtLeast(0),
++				Description:  "ID of the HDM smart proxy for the host.",
++			},
+ 
+ 			"location_name": {
+ 				Type:         schema.TypeString,
+@@ -851,6 +893,18 @@ func buildForemanHost(d *schema.ResourceData) *api.ForemanHost {
+ 	if hostgroupId != 0 {
+ 		host.HostgroupId = &hostgroupId
+ 	}
++	puppetProxyId := d.Get("puppet_proxy_id").(int)
++	if puppetProxyId != 0 {
++		host.PuppetProxyId = &puppetProxyId
++	}
++	puppetCAProxyId := d.Get("puppet_ca_proxy_id").(int)
++	if puppetCAProxyId != 0 {
++		host.PuppetCAProxyId = &puppetCAProxyId
++	}
++	hdmProxyId := d.Get("hdm_proxy_id").(int)
++	if hdmProxyId != 0 {
++		host.HdmProxyId = &hdmProxyId
++	}
+ 	architectureId := d.Get("architecture_id").(int)
+ 	if architectureId != 0 {
+ 		host.ArchitectureId = &architectureId
+@@ -1107,6 +1161,9 @@ func setResourceDataFromForemanHost(d *schema.ResourceData, fh *api.ForemanHost)
+ 	d.Set("domain_id", fh.DomainId)
+ 	d.Set("domain_name", fh.DomainName)
+ 	d.Set("environment_id", fh.EnvironmentId)
++	d.Set("puppet_proxy_id", fh.PuppetProxyId)
++	d.Set("puppet_ca_proxy_id", fh.PuppetCAProxyId)
++	d.Set("hdm_proxy_id", fh.HdmProxyId)
+ 	d.Set("owner_id", fh.OwnerId)
+ 	d.Set("owner_type", fh.OwnerType)
+ 	d.Set("hostgroup_id", fh.HostgroupId)
+@@ -1383,6 +1440,9 @@ func resourceForemanHostUpdate(ctx context.Context, d *schema.ResourceData, meta
+ 		d.HasChange("compute_attributes") ||
+ 		d.HasChange("domain_id") ||
+ 		d.HasChange("environment_id") ||
++		d.HasChange("puppet_proxy_id") ||
++		d.HasChange("puppet_ca_proxy_id") ||
++		d.HasChange("hdm_proxy_id") ||
+ 		d.HasChange("owner_id") ||
+ 		d.HasChange("owner_type") ||
+ 		d.HasChange("hostgroup_id") ||

@@ -1281,6 +1281,10 @@
                     "type": "string",
                     "description": "Host fully qualified domain name. Read-only value to be used in variables. @EXAMPLE \"compute01.dc1.company.com\"\n"
                 },
+                "hdmProxyId": {
+                    "type": "integer",
+                    "description": "ID of the HDM smart proxy for the host.\n"
+                },
                 "hostgroupId": {
                     "type": "integer",
                     "description": "ID of the hostgroup to assign to the host.\n"
@@ -1351,12 +1355,20 @@
                     "type": "integer",
                     "description": "ID of the partition table the host should use\n"
                 },
+                "puppetCaProxyId": {
+                    "type": "integer",
+                    "description": "ID of the smart proxy acting as the puppet CA for the host.\n"
+                },
                 "puppetClassIds": {
                     "type": "array",
                     "items": {
                         "type": "integer"
                     },
                     "description": "IDs of the applied puppet classes.\n"
+                },
+                "puppetProxyId": {
+                    "type": "integer",
+                    "description": "ID of the smart proxy acting as the puppet proxy server for the host.\n"
                 },
                 "retryCount": {
                     "type": "integer",
@@ -1396,6 +1408,7 @@
                 "domainName",
                 "environmentId",
                 "fqdn",
+                "hdmProxyId",
                 "hostgroupId",
                 "imageId",
                 "interfacesAttributes",
@@ -1407,7 +1420,9 @@
                 "ownerType",
                 "parameters",
                 "ptableId",
+                "puppetCaProxyId",
                 "puppetClassIds",
+                "puppetProxyId",
                 "shortname",
                 "subnetId",
                 "token"
@@ -1455,6 +1470,10 @@
                 "environmentId": {
                     "type": "integer",
                     "description": "ID of the environment to assign to the host.\n"
+                },
+                "hdmProxyId": {
+                    "type": "integer",
+                    "description": "ID of the HDM smart proxy for the host.\n"
                 },
                 "hostgroupId": {
                     "type": "integer",
@@ -1532,12 +1551,20 @@
                     "type": "integer",
                     "description": "ID of the partition table the host should use\n"
                 },
+                "puppetCaProxyId": {
+                    "type": "integer",
+                    "description": "ID of the smart proxy acting as the puppet CA for the host.\n"
+                },
                 "puppetClassIds": {
                     "type": "array",
                     "items": {
                         "type": "integer"
                     },
                     "description": "IDs of the applied puppet classes.\n"
+                },
+                "puppetProxyId": {
+                    "type": "integer",
+                    "description": "ID of the smart proxy acting as the puppet proxy server for the host.\n"
                 },
                 "retryCount": {
                     "type": "integer",
@@ -1620,6 +1647,10 @@
                         "type": "string",
                         "description": "Host fully qualified domain name. Read-only value to be used in variables. @EXAMPLE \"compute01.dc1.company.com\"\n"
                     },
+                    "hdmProxyId": {
+                        "type": "integer",
+                        "description": "ID of the HDM smart proxy for the host.\n"
+                    },
                     "hostgroupId": {
                         "type": "integer",
                         "description": "ID of the hostgroup to assign to the host.\n",
@@ -1696,12 +1727,20 @@
                         "type": "integer",
                         "description": "ID of the partition table the host should use\n"
                     },
+                    "puppetCaProxyId": {
+                        "type": "integer",
+                        "description": "ID of the smart proxy acting as the puppet CA for the host.\n"
+                    },
                     "puppetClassIds": {
                         "type": "array",
                         "items": {
                             "type": "integer"
                         },
                         "description": "IDs of the applied puppet classes.\n"
+                    },
+                    "puppetProxyId": {
+                        "type": "integer",
+                        "description": "ID of the smart proxy acting as the puppet proxy server for the host.\n"
                     },
                     "retryCount": {
                         "type": "integer",
