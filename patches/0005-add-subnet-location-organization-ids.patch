@@ -1,0 +1,83 @@
+diff --git a/foreman/api/subnet.go b/foreman/api/subnet.go
+index 9fdc7e6..9057afc 100644
+--- a/foreman/api/subnet.go
++++ b/foreman/api/subnet.go
+@@ -72,6 +72,14 @@ type ForemanSubnet struct {
+ 	DomainIDs []int `json:"domain_ids"`
+ 	// Domains (for internal use)
+ 	Domains []Domain `json:"domains"`
++	// Location IDs assigned to this subnet
++	LocationIDs []int `json:"location_ids,omitempty"`
++	// Locations (for internal use on read)
++	Locations []Domain `json:"locations,omitempty"`
++	// Organization IDs assigned to this subnet
++	OrganizationIDs []int `json:"organization_ids,omitempty"`
++	// Organizations (for internal use on read)
++	Organizations []Domain `json:"organizations,omitempty"`
+ 	// Network Type
+ 	NetworkType string `json:"network_type"`
+ }
+@@ -144,6 +152,12 @@ func (c *Client) ReadSubnet(ctx context.Context, id int) (*ForemanSubnet, error)
+ 	for _, m := range readSubnet.Domains {
+ 		readSubnet.DomainIDs = append(readSubnet.DomainIDs, m.ID)
+ 	}
++	for _, location := range readSubnet.Locations {
++		readSubnet.LocationIDs = append(readSubnet.LocationIDs, location.ID)
++	}
++	for _, organization := range readSubnet.Organizations {
++		readSubnet.OrganizationIDs = append(readSubnet.OrganizationIDs, organization.ID)
++	}
+ 
+ 	log.Debugf("readSubnet: [%+v]", readSubnet)
+ 
+diff --git a/foreman/resource_foreman_subnet.go b/foreman/resource_foreman_subnet.go
+index 0085fe2..174fe6b 100644
+--- a/foreman/resource_foreman_subnet.go
++++ b/foreman/resource_foreman_subnet.go
+@@ -177,6 +177,22 @@ func resourceForemanSubnet() *schema.Resource {
+ 				Optional:    true,
+ 				Description: "Domains in which this subnet is part",
+ 			},
++			"location_ids": {
++				Type: schema.TypeSet,
++				Elem: &schema.Schema{
++					Type: schema.TypeInt,
++				},
++				Optional:    true,
++				Description: "Locations to assign this subnet to",
++			},
++			"organization_ids": {
++				Type: schema.TypeSet,
++				Elem: &schema.Schema{
++					Type: schema.TypeInt,
++				},
++				Optional:    true,
++				Description: "Organizations to assign this subnet to",
++			},
+ 			"network_type": {
+ 				Type:     schema.TypeString,
+ 				Optional: true,
+@@ -271,6 +287,14 @@ func buildForemanSubnet(d *schema.ResourceData) *api.ForemanSubnet {
+ 		attrSet := attr.(*schema.Set)
+ 		s.DomainIDs = conv.InterfaceSliceToIntSlice(attrSet.List())
+ 	}
++	if attr, ok = d.GetOk("location_ids"); ok {
++		attrSet := attr.(*schema.Set)
++		s.LocationIDs = conv.InterfaceSliceToIntSlice(attrSet.List())
++	}
++	if attr, ok = d.GetOk("organization_ids"); ok {
++		attrSet := attr.(*schema.Set)
++		s.OrganizationIDs = conv.InterfaceSliceToIntSlice(attrSet.List())
++	}
+ 	if attr, ok = d.GetOk("network_type"); ok {
+ 		s.NetworkType = attr.(string)
+ 	}
+@@ -305,6 +329,8 @@ func setResourceDataFromForemanSubnet(d *schema.ResourceData, fs *api.ForemanSub
+ 	d.Set("tftp_id", fs.TftpID)
+ 	d.Set("httpboot_id", fs.HTTPBootID)
+ 	d.Set("domain_ids", fs.DomainIDs)
++	d.Set("location_ids", fs.LocationIDs)
++	d.Set("organization_ids", fs.OrganizationIDs)
+ 	d.Set("network_type", fs.NetworkType)
+ 	d.Set("description", fs.Description)
+ }

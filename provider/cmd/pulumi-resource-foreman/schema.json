@@ -4373,6 +4373,13 @@
                     "type": "string",
                     "description": "IP address auto-suggestion for this subnet. Valid values include: `\"DHCP\"`, `\"Internal DB\"`, `\"Random DB\"`,`\"None\"`.\n"
                 },
+                "locationIds": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    },
+                    "description": "Locations to assign this subnet to\n"
+                },
                 "mask": {
                     "type": "string",
                     "description": "Netmask for this subnet. @EXAMPLE \"255.255.255.0\"\n"
@@ -4396,6 +4403,13 @@
                 "networkType": {
                     "type": "string",
                     "description": "Type or protocol, IPv4 or IPv6, defaults to IPv4.\n"
+                },
+                "organizationIds": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    },
+                    "description": "Organizations to assign this subnet to\n"
                 },
                 "templateId": {
                     "type": "integer",
@@ -4468,6 +4482,13 @@
                     "type": "string",
                     "description": "IP address auto-suggestion for this subnet. Valid values include: `\"DHCP\"`, `\"Internal DB\"`, `\"Random DB\"`,`\"None\"`.\n"
                 },
+                "locationIds": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    },
+                    "description": "Locations to assign this subnet to\n"
+                },
                 "mask": {
                     "type": "string",
                     "description": "Netmask for this subnet. @EXAMPLE \"255.255.255.0\"\n"
@@ -4491,6 +4512,13 @@
                 "networkType": {
                     "type": "string",
                     "description": "Type or protocol, IPv4 or IPv6, defaults to IPv4.\n"
+                },
+                "organizationIds": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    },
+                    "description": "Organizations to assign this subnet to\n"
                 },
                 "templateId": {
                     "type": "integer",
@@ -4567,6 +4595,13 @@
                         "type": "string",
                         "description": "IP address auto-suggestion for this subnet. Valid values include: `\"DHCP\"`, `\"Internal DB\"`, `\"Random DB\"`,`\"None\"`.\n"
                     },
+                    "locationIds": {
+                        "type": "array",
+                        "items": {
+                            "type": "integer"
+                        },
+                        "description": "Locations to assign this subnet to\n"
+                    },
                     "mask": {
                         "type": "string",
                         "description": "Netmask for this subnet. @EXAMPLE \"255.255.255.0\"\n"
@@ -4590,6 +4625,13 @@
                     "networkType": {
                         "type": "string",
                         "description": "Type or protocol, IPv4 or IPv6, defaults to IPv4.\n"
+                    },
+                    "organizationIds": {
+                        "type": "array",
+                        "items": {
+                            "type": "integer"
+                        },
+                        "description": "Organizations to assign this subnet to\n"
                     },
                     "templateId": {
                         "type": "integer",
@@ -5037,25 +5079,25 @@
                 "description": "A collection of values returned by getArchitecture.\n",
                 "properties": {
                     "id": {
-                        "description": "The provider-assigned unique ID for this managed resource.\n",
-                        "type": "string"
+                        "type": "string",
+                        "description": "The provider-assigned unique ID for this managed resource.\n"
                     },
                     "name": {
                         "type": "string"
                     },
                     "operatingsystemIds": {
+                        "type": "array",
                         "items": {
                             "type": "integer"
-                        },
-                        "type": "array"
+                        }
                     }
                 },
+                "type": "object",
                 "required": [
                     "name",
                     "operatingsystemIds",
                     "id"
-                ],
-                "type": "object"
+                ]
             }
         },
         "foreman:index/getComputeprofile:getComputeprofile": {
@@ -5075,25 +5117,25 @@
                 "description": "A collection of values returned by getComputeprofile.\n",
                 "properties": {
                     "computeAttributes": {
+                        "type": "array",
                         "items": {
                             "$ref": "#/types/foreman:index/getComputeprofileComputeAttribute:getComputeprofileComputeAttribute"
-                        },
-                        "type": "array"
+                        }
                     },
                     "id": {
-                        "description": "The provider-assigned unique ID for this managed resource.\n",
-                        "type": "string"
+                        "type": "string",
+                        "description": "The provider-assigned unique ID for this managed resource.\n"
                     },
                     "name": {
                         "type": "string"
                     }
                 },
+                "type": "object",
                 "required": [
                     "computeAttributes",
                     "name",
                     "id"
-                ],
-                "type": "object"
+                ]
             }
         },
         "foreman:index/getComputeresource:getComputeresource": {
@@ -5128,8 +5170,8 @@
                         "type": "string"
                     },
                     "id": {
-                        "description": "The provider-assigned unique ID for this managed resource.\n",
-                        "type": "string"
+                        "type": "string",
+                        "description": "The provider-assigned unique ID for this managed resource.\n"
                     },
                     "name": {
                         "type": "string"
@@ -5150,6 +5192,7 @@
                         "type": "string"
                     }
                 },
+                "type": "object",
                 "required": [
                     "cachingenabled",
                     "datacenter",
@@ -5163,8 +5206,7 @@
                     "url",
                     "user",
                     "id"
-                ],
-                "type": "object"
+                ]
             }
         },
         "foreman:index/getDefaulttemplate:getDefaulttemplate": {
@@ -5184,8 +5226,8 @@
                 "description": "A collection of values returned by getDefaulttemplate.\n",
                 "properties": {
                     "id": {
-                        "description": "The provider-assigned unique ID for this managed resource.\n",
-                        "type": "string"
+                        "type": "string",
+                        "description": "The provider-assigned unique ID for this managed resource.\n"
                     },
                     "name": {
                         "type": "string"
@@ -5200,14 +5242,14 @@
                         "type": "integer"
                     }
                 },
+                "type": "object",
                 "required": [
                     "name",
                     "operatingsystemId",
                     "provisioningtemplateId",
                     "templatekindId",
                     "id"
-                ],
-                "type": "object"
+                ]
             }
         },
         "foreman:index/getDomain:getDomain": {
@@ -5230,26 +5272,26 @@
                         "type": "string"
                     },
                     "id": {
-                        "description": "The provider-assigned unique ID for this managed resource.\n",
-                        "type": "string"
+                        "type": "string",
+                        "description": "The provider-assigned unique ID for this managed resource.\n"
                     },
                     "name": {
                         "type": "string"
                     },
                     "parameters": {
+                        "type": "object",
                         "additionalProperties": {
                             "type": "string"
-                        },
-                        "type": "object"
+                        }
                     }
                 },
+                "type": "object",
                 "required": [
                     "fullname",
                     "name",
                     "parameters",
                     "id"
-                ],
-                "type": "object"
+                ]
             }
         },
         "foreman:index/getEnvironment:getEnvironment": {
@@ -5269,18 +5311,18 @@
                 "description": "A collection of values returned by getEnvironment.\n",
                 "properties": {
                     "id": {
-                        "description": "The provider-assigned unique ID for this managed resource.\n",
-                        "type": "string"
+                        "type": "string",
+                        "description": "The provider-assigned unique ID for this managed resource.\n"
                     },
                     "name": {
                         "type": "string"
                     }
                 },
+                "type": "object",
                 "required": [
                     "name",
                     "id"
-                ],
-                "type": "object"
+                ]
             }
         },
         "foreman:index/getGlobalParameter:getGlobalParameter": {
@@ -5300,8 +5342,8 @@
                 "description": "A collection of values returned by getGlobalParameter.\n",
                 "properties": {
                     "id": {
-                        "description": "The provider-assigned unique ID for this managed resource.\n",
-                        "type": "string"
+                        "type": "string",
+                        "description": "The provider-assigned unique ID for this managed resource.\n"
                     },
                     "name": {
                         "type": "string"
@@ -5310,12 +5352,12 @@
                         "type": "string"
                     }
                 },
+                "type": "object",
                 "required": [
                     "name",
                     "value",
                     "id"
-                ],
-                "type": "object"
+                ]
             }
         },
         "foreman:index/getHostgroup:getHostgroup": {
@@ -5344,10 +5386,10 @@
                         "type": "integer"
                     },
                     "configGroupIds": {
+                        "type": "array",
                         "items": {
                             "type": "integer"
-                        },
-                        "type": "array"
+                        }
                     },
                     "contentSourceId": {
                         "type": "integer"
@@ -5362,8 +5404,8 @@
                         "type": "integer"
                     },
                     "id": {
-                        "description": "The provider-assigned unique ID for this managed resource.\n",
-                        "type": "string"
+                        "type": "string",
+                        "description": "The provider-assigned unique ID for this managed resource.\n"
                     },
                     "lifecycleEnvironmentId": {
                         "type": "integer"
@@ -5378,10 +5420,10 @@
                         "type": "integer"
                     },
                     "parameters": {
+                        "type": "object",
                         "additionalProperties": {
                             "type": "string"
-                        },
-                        "type": "object"
+                        }
                     },
                     "parentId": {
                         "type": "integer"
@@ -5393,10 +5435,10 @@
                         "type": "integer"
                     },
                     "puppetClassIds": {
+                        "type": "array",
                         "items": {
                             "type": "integer"
-                        },
-                        "type": "array"
+                        }
                     },
                     "puppetProxyId": {
                         "type": "integer"
@@ -5417,6 +5459,7 @@
                         "type": "string"
                     }
                 },
+                "type": "object",
                 "required": [
                     "architectureId",
                     "computeProfileId",
@@ -5442,8 +5485,7 @@
                     "subnetId",
                     "title",
                     "id"
-                ],
-                "type": "object"
+                ]
             }
         },
         "foreman:index/getHttpproxy:getHttpproxy": {
@@ -5463,8 +5505,8 @@
                 "description": "A collection of values returned by getHttpproxy.\n",
                 "properties": {
                     "id": {
-                        "description": "The provider-assigned unique ID for this managed resource.\n",
-                        "type": "string"
+                        "type": "string",
+                        "description": "The provider-assigned unique ID for this managed resource.\n"
                     },
                     "name": {
                         "type": "string"
@@ -5473,12 +5515,12 @@
                         "type": "string"
                     }
                 },
+                "type": "object",
                 "required": [
                     "name",
                     "url",
                     "id"
-                ],
-                "type": "object"
+                ]
             }
         },
         "foreman:index/getImage:getImage": {
@@ -5508,8 +5550,8 @@
                         "type": "integer"
                     },
                     "id": {
-                        "description": "The provider-assigned unique ID for this managed resource.\n",
-                        "type": "string"
+                        "type": "string",
+                        "description": "The provider-assigned unique ID for this managed resource.\n"
                     },
                     "name": {
                         "type": "string"
@@ -5527,6 +5569,7 @@
                         "type": "string"
                     }
                 },
+                "type": "object",
                 "required": [
                     "architectureId",
                     "computeResourceId",
@@ -5536,8 +5579,7 @@
                     "username",
                     "uuid",
                     "id"
-                ],
-                "type": "object"
+                ]
             }
         },
         "foreman:index/getJobtemplate:getJobtemplate": {
@@ -5563,8 +5605,8 @@
                         "type": "string"
                     },
                     "id": {
-                        "description": "The provider-assigned unique ID for this managed resource.\n",
-                        "type": "string"
+                        "type": "string",
+                        "description": "The provider-assigned unique ID for this managed resource.\n"
                     },
                     "jobCategory": {
                         "type": "string"
@@ -5585,12 +5627,13 @@
                         "type": "string"
                     },
                     "templateInputs": {
+                        "type": "array",
                         "items": {
                             "$ref": "#/types/foreman:index/getJobtemplateTemplateInput:getJobtemplateTemplateInput"
-                        },
-                        "type": "array"
+                        }
                     }
                 },
+                "type": "object",
                 "required": [
                     "description",
                     "descriptionFormat",
@@ -5602,8 +5645,7 @@
                     "template",
                     "templateInputs",
                     "id"
-                ],
-                "type": "object"
+                ]
             }
         },
         "foreman:index/getKatelloContentCredential:getKatelloContentCredential": {
@@ -5626,19 +5668,19 @@
                         "type": "string"
                     },
                     "id": {
-                        "description": "The provider-assigned unique ID for this managed resource.\n",
-                        "type": "string"
+                        "type": "string",
+                        "description": "The provider-assigned unique ID for this managed resource.\n"
                     },
                     "name": {
                         "type": "string"
                     }
                 },
+                "type": "object",
                 "required": [
                     "content",
                     "name",
                     "id"
-                ],
-                "type": "object"
+                ]
             }
         },
         "foreman:index/getKatelloContentView:getKatelloContentView": {
@@ -5661,10 +5703,10 @@
                         "type": "boolean"
                     },
                     "componentIds": {
+                        "type": "array",
                         "items": {
                             "type": "integer"
-                        },
-                        "type": "array"
+                        }
                     },
                     "composite": {
                         "type": "boolean"
@@ -5676,14 +5718,14 @@
                         "type": "boolean"
                     },
                     "filters": {
+                        "type": "array",
                         "items": {
                             "$ref": "#/types/foreman:index/getKatelloContentViewFilter:getKatelloContentViewFilter"
-                        },
-                        "type": "array"
+                        }
                     },
                     "id": {
-                        "description": "The provider-assigned unique ID for this managed resource.\n",
-                        "type": "string"
+                        "type": "string",
+                        "description": "The provider-assigned unique ID for this managed resource.\n"
                     },
                     "label": {
                         "type": "string"
@@ -5698,15 +5740,16 @@
                         "type": "integer"
                     },
                     "repositoryIds": {
+                        "type": "array",
                         "items": {
                             "type": "integer"
-                        },
-                        "type": "array"
+                        }
                     },
                     "solveDependencies": {
                         "type": "boolean"
                     }
                 },
+                "type": "object",
                 "required": [
                     "autoPublish",
                     "componentIds",
@@ -5721,8 +5764,7 @@
                     "repositoryIds",
                     "solveDependencies",
                     "id"
-                ],
-                "type": "object"
+                ]
             }
         },
         "foreman:index/getKatelloLifecycleEnvironment:getKatelloLifecycleEnvironment": {
@@ -5745,8 +5787,8 @@
                         "type": "string"
                     },
                     "id": {
-                        "description": "The provider-assigned unique ID for this managed resource.\n",
-                        "type": "string"
+                        "type": "string",
+                        "description": "The provider-assigned unique ID for this managed resource.\n"
                     },
                     "label": {
                         "type": "string"
@@ -5767,6 +5809,7 @@
                         "type": "integer"
                     }
                 },
+                "type": "object",
                 "required": [
                     "description",
                     "label",
@@ -5776,8 +5819,7 @@
                     "priorId",
                     "successorId",
                     "id"
-                ],
-                "type": "object"
+                ]
             }
         },
         "foreman:index/getKatelloProduct:getKatelloProduct": {
@@ -5803,8 +5845,8 @@
                         "type": "integer"
                     },
                     "id": {
-                        "description": "The provider-assigned unique ID for this managed resource.\n",
-                        "type": "string"
+                        "type": "string",
+                        "description": "The provider-assigned unique ID for this managed resource.\n"
                     },
                     "label": {
                         "type": "string"
@@ -5825,6 +5867,7 @@
                         "type": "integer"
                     }
                 },
+                "type": "object",
                 "required": [
                     "description",
                     "gpgKeyId",
@@ -5835,8 +5878,7 @@
                     "sslClientKeyId",
                     "syncPlanId",
                     "id"
-                ],
-                "type": "object"
+                ]
             }
         },
         "foreman:index/getKatelloRepository:getKatelloRepository": {
@@ -5898,8 +5940,8 @@
                         "type": "string"
                     },
                     "id": {
-                        "description": "The provider-assigned unique ID for this managed resource.\n",
-                        "type": "string"
+                        "type": "string",
+                        "description": "The provider-assigned unique ID for this managed resource.\n"
                     },
                     "ignorableContent": {
                         "type": "string"
@@ -5938,6 +5980,7 @@
                         "type": "boolean"
                     }
                 },
+                "type": "object",
                 "required": [
                     "ansibleCollectionRequirements",
                     "checksumType",
@@ -5966,8 +6009,7 @@
                     "url",
                     "verifySslOnSync",
                     "id"
-                ],
-                "type": "object"
+                ]
             }
         },
         "foreman:index/getKatelloSyncPlan:getKatelloSyncPlan": {
@@ -5996,8 +6038,8 @@
                         "type": "boolean"
                     },
                     "id": {
-                        "description": "The provider-assigned unique ID for this managed resource.\n",
-                        "type": "string"
+                        "type": "string",
+                        "description": "The provider-assigned unique ID for this managed resource.\n"
                     },
                     "interval": {
                         "type": "string"
@@ -6009,6 +6051,7 @@
                         "type": "string"
                     }
                 },
+                "type": "object",
                 "required": [
                     "cronExpression",
                     "description",
@@ -6017,8 +6060,7 @@
                     "name",
                     "syncDate",
                     "id"
-                ],
-                "type": "object"
+                ]
             }
         },
         "foreman:index/getMedia:getMedia": {
@@ -6038,17 +6080,17 @@
                 "description": "A collection of values returned by getMedia.\n",
                 "properties": {
                     "id": {
-                        "description": "The provider-assigned unique ID for this managed resource.\n",
-                        "type": "string"
+                        "type": "string",
+                        "description": "The provider-assigned unique ID for this managed resource.\n"
                     },
                     "name": {
                         "type": "string"
                     },
                     "operatingsystemIds": {
+                        "type": "array",
                         "items": {
                             "type": "integer"
-                        },
-                        "type": "array"
+                        }
                     },
                     "osFamily": {
                         "type": "string"
@@ -6057,14 +6099,14 @@
                         "type": "string"
                     }
                 },
+                "type": "object",
                 "required": [
                     "name",
                     "operatingsystemIds",
                     "osFamily",
                     "path",
                     "id"
-                ],
-                "type": "object"
+                ]
             }
         },
         "foreman:index/getModel:getModel": {
@@ -6087,8 +6129,8 @@
                         "type": "string"
                     },
                     "id": {
-                        "description": "The provider-assigned unique ID for this managed resource.\n",
-                        "type": "string"
+                        "type": "string",
+                        "description": "The provider-assigned unique ID for this managed resource.\n"
                     },
                     "info": {
                         "type": "string"
@@ -6100,14 +6142,14 @@
                         "type": "string"
                     }
                 },
+                "type": "object",
                 "required": [
                     "hardwareModel",
                     "info",
                     "name",
                     "vendorClass",
                     "id"
-                ],
-                "type": "object"
+                ]
             }
         },
         "foreman:index/getOperatingsystem:getOperatingsystem": {
@@ -6127,10 +6169,10 @@
                 "description": "A collection of values returned by getOperatingsystem.\n",
                 "properties": {
                     "architectures": {
+                        "type": "array",
                         "items": {
                             "type": "integer"
-                        },
-                        "type": "array"
+                        }
                     },
                     "description": {
                         "type": "string"
@@ -6139,17 +6181,17 @@
                         "type": "string"
                     },
                     "id": {
-                        "description": "The provider-assigned unique ID for this managed resource.\n",
-                        "type": "string"
+                        "type": "string",
+                        "description": "The provider-assigned unique ID for this managed resource.\n"
                     },
                     "major": {
                         "type": "string"
                     },
                     "media": {
+                        "type": "array",
                         "items": {
                             "type": "integer"
-                        },
-                        "type": "array"
+                        }
                     },
                     "minor": {
                         "type": "string"
@@ -6158,25 +6200,25 @@
                         "type": "string"
                     },
                     "parameters": {
+                        "type": "object",
                         "additionalProperties": {
                             "type": "string"
-                        },
-                        "type": "object"
+                        }
                     },
                     "partitiontables": {
+                        "type": "array",
                         "items": {
                             "type": "integer"
-                        },
-                        "type": "array"
+                        }
                     },
                     "passwordHash": {
                         "type": "string"
                     },
                     "provisioningTemplates": {
+                        "type": "array",
                         "items": {
                             "type": "integer"
-                        },
-                        "type": "array"
+                        }
                     },
                     "releaseName": {
                         "type": "string"
@@ -6185,6 +6227,7 @@
                         "type": "string"
                     }
                 },
+                "type": "object",
                 "required": [
                     "architectures",
                     "description",
@@ -6200,8 +6243,7 @@
                     "releaseName",
                     "title",
                     "id"
-                ],
-                "type": "object"
+                ]
             }
         },
         "foreman:index/getParameter:getParameter": {
@@ -6230,8 +6272,8 @@
                         "type": "integer"
                     },
                     "id": {
-                        "description": "The provider-assigned unique ID for this managed resource.\n",
-                        "type": "string"
+                        "type": "string",
+                        "description": "The provider-assigned unique ID for this managed resource.\n"
                     },
                     "name": {
                         "type": "string"
@@ -6246,6 +6288,7 @@
                         "type": "string"
                     }
                 },
+                "type": "object",
                 "required": [
                     "domainId",
                     "hostId",
@@ -6255,8 +6298,7 @@
                     "subnetId",
                     "value",
                     "id"
-                ],
-                "type": "object"
+                ]
             }
         },
         "foreman:index/getPartitiontable:getPartitiontable": {
@@ -6282,20 +6324,20 @@
                         "type": "string"
                     },
                     "hostIds": {
+                        "type": "array",
                         "items": {
                             "type": "integer"
-                        },
-                        "type": "array"
+                        }
                     },
                     "hostgroupIds": {
+                        "type": "array",
                         "items": {
                             "type": "integer"
-                        },
-                        "type": "array"
+                        }
                     },
                     "id": {
-                        "description": "The provider-assigned unique ID for this managed resource.\n",
-                        "type": "string"
+                        "type": "string",
+                        "description": "The provider-assigned unique ID for this managed resource.\n"
                     },
                     "layout": {
                         "type": "string"
@@ -6307,10 +6349,10 @@
                         "type": "string"
                     },
                     "operatingsystemIds": {
+                        "type": "array",
                         "items": {
                             "type": "integer"
-                        },
-                        "type": "array"
+                        }
                     },
                     "osFamily": {
                         "type": "string"
@@ -6319,6 +6361,7 @@
                         "type": "boolean"
                     }
                 },
+                "type": "object",
                 "required": [
                     "auditComment",
                     "description",
@@ -6331,8 +6374,7 @@
                     "osFamily",
                     "snippet",
                     "id"
-                ],
-                "type": "object"
+                ]
             }
         },
         "foreman:index/getPolicy:getPolicy": {
@@ -6353,18 +6395,18 @@
                 "description": "A collection of values returned by getPolicy.\n",
                 "properties": {
                     "id": {
-                        "description": "The provider-assigned unique ID for this managed resource.\n",
-                        "type": "string"
+                        "type": "string",
+                        "description": "The provider-assigned unique ID for this managed resource.\n"
                     },
                     "name": {
                         "type": "string"
                     }
                 },
+                "type": "object",
                 "required": [
                     "name",
                     "id"
-                ],
-                "type": "object"
+                ]
             }
         },
         "foreman:index/getProvisioningtemplate:getProvisioningtemplate": {
@@ -6390,8 +6432,8 @@
                         "type": "string"
                     },
                     "id": {
-                        "description": "The provider-assigned unique ID for this managed resource.\n",
-                        "type": "string"
+                        "type": "string",
+                        "description": "The provider-assigned unique ID for this managed resource.\n"
                     },
                     "locked": {
                         "type": "boolean"
@@ -6400,10 +6442,10 @@
                         "type": "string"
                     },
                     "operatingsystemIds": {
+                        "type": "array",
                         "items": {
                             "type": "integer"
-                        },
-                        "type": "array"
+                        }
                     },
                     "snippet": {
                         "type": "boolean"
@@ -6412,15 +6454,16 @@
                         "type": "string"
                     },
                     "templateCombinationsAttributes": {
+                        "type": "array",
                         "items": {
                             "$ref": "#/types/foreman:index/getProvisioningtemplateTemplateCombinationsAttribute:getProvisioningtemplateTemplateCombinationsAttribute"
-                        },
-                        "type": "array"
+                        }
                     },
                     "templateKindId": {
                         "type": "integer"
                     }
                 },
+                "type": "object",
                 "required": [
                     "auditComment",
                     "description",
@@ -6432,8 +6475,7 @@
                     "templateCombinationsAttributes",
                     "templateKindId",
                     "id"
-                ],
-                "type": "object"
+                ]
             }
         },
         "foreman:index/getPuppetclass:getPuppetclass": {
@@ -6453,18 +6495,18 @@
                 "description": "A collection of values returned by getPuppetclass.\n",
                 "properties": {
                     "id": {
-                        "description": "The provider-assigned unique ID for this managed resource.\n",
-                        "type": "string"
+                        "type": "string",
+                        "description": "The provider-assigned unique ID for this managed resource.\n"
                     },
                     "name": {
                         "type": "string"
                     }
                 },
+                "type": "object",
                 "required": [
                     "name",
                     "id"
-                ],
-                "type": "object"
+                ]
             }
         },
         "foreman:index/getSetting:getSetting": {
@@ -6493,8 +6535,8 @@
                         "type": "string"
                     },
                     "id": {
-                        "description": "The provider-assigned unique ID for this managed resource.\n",
-                        "type": "string"
+                        "type": "string",
+                        "description": "The provider-assigned unique ID for this managed resource.\n"
                     },
                     "name": {
                         "type": "string"
@@ -6509,6 +6551,7 @@
                         "type": "string"
                     }
                 },
+                "type": "object",
                 "required": [
                     "categoryName",
                     "default",
@@ -6518,8 +6561,7 @@
                     "settingsType",
                     "value",
                     "id"
-                ],
-                "type": "object"
+                ]
             }
         },
         "foreman:index/getSmartclassparameter:getSmartclassparameter": {
@@ -6543,8 +6585,8 @@
                 "description": "A collection of values returned by getSmartclassparameter.\n",
                 "properties": {
                     "id": {
-                        "description": "The provider-assigned unique ID for this managed resource.\n",
-                        "type": "string"
+                        "type": "string",
+                        "description": "The provider-assigned unique ID for this managed resource.\n"
                     },
                     "parameter": {
                         "type": "string"
@@ -6553,12 +6595,12 @@
                         "type": "integer"
                     }
                 },
+                "type": "object",
                 "required": [
                     "parameter",
                     "puppetclassId",
                     "id"
-                ],
-                "type": "object"
+                ]
             }
         },
         "foreman:index/getSmartproxy:getSmartproxy": {
@@ -6578,8 +6620,8 @@
                 "description": "A collection of values returned by getSmartproxy.\n",
                 "properties": {
                     "id": {
-                        "description": "The provider-assigned unique ID for this managed resource.\n",
-                        "type": "string"
+                        "type": "string",
+                        "description": "The provider-assigned unique ID for this managed resource.\n"
                     },
                     "name": {
                         "type": "string"
@@ -6588,12 +6630,12 @@
                         "type": "string"
                     }
                 },
+                "type": "object",
                 "required": [
                     "name",
                     "url",
                     "id"
-                ],
-                "type": "object"
+                ]
             }
         },
         "foreman:index/getSubnet:getSubnet": {
@@ -6631,10 +6673,10 @@
                         "type": "string"
                     },
                     "domainIds": {
+                        "type": "array",
                         "items": {
                             "type": "integer"
-                        },
-                        "type": "array"
+                        }
                     },
                     "from": {
                         "type": "string"
@@ -6646,11 +6688,17 @@
                         "type": "integer"
                     },
                     "id": {
-                        "description": "The provider-assigned unique ID for this managed resource.\n",
-                        "type": "string"
+                        "type": "string",
+                        "description": "The provider-assigned unique ID for this managed resource.\n"
                     },
                     "ipam": {
                         "type": "string"
+                    },
+                    "locationIds": {
+                        "type": "array",
+                        "items": {
+                            "type": "integer"
+                        }
                     },
                     "mask": {
                         "type": "string"
@@ -6670,6 +6718,12 @@
                     "networkType": {
                         "type": "string"
                     },
+                    "organizationIds": {
+                        "type": "array",
+                        "items": {
+                            "type": "integer"
+                        }
+                    },
                     "templateId": {
                         "type": "integer"
                     },
@@ -6683,6 +6737,7 @@
                         "type": "integer"
                     }
                 },
+                "type": "object",
                 "required": [
                     "bmcId",
                     "bootMode",
@@ -6695,17 +6750,18 @@
                     "gateway",
                     "httpbootId",
                     "ipam",
+                    "locationIds",
                     "mask",
                     "mtu",
                     "networkAddress",
                     "networkType",
+                    "organizationIds",
                     "templateId",
                     "tftpId",
                     "to",
                     "vlanid",
                     "id"
-                ],
-                "type": "object"
+                ]
             }
         },
         "foreman:index/getTemplateinput:getTemplateinput": {
@@ -6758,6 +6814,7 @@
                         "type": "string"
                     }
                 },
+                "type": "object",
                 "required": [
                     "advanced",
                     "default",
@@ -6774,8 +6831,7 @@
                     "templateId",
                     "valueType",
                     "variableName"
-                ],
-                "type": "object"
+                ]
             }
         },
         "foreman:index/getTemplatekind:getTemplatekind": {
@@ -6795,18 +6851,18 @@
                 "description": "A collection of values returned by getTemplatekind.\n",
                 "properties": {
                     "id": {
-                        "description": "The provider-assigned unique ID for this managed resource.\n",
-                        "type": "string"
+                        "type": "string",
+                        "description": "The provider-assigned unique ID for this managed resource.\n"
                     },
                     "name": {
                         "type": "string"
                     }
                 },
+                "type": "object",
                 "required": [
                     "name",
                     "id"
-                ],
-                "type": "object"
+                ]
             }
         },
         "foreman:index/getUser:getUser": {
@@ -6853,8 +6909,8 @@
                         "type": "string"
                     },
                     "id": {
-                        "description": "The provider-assigned unique ID for this managed resource.\n",
-                        "type": "string"
+                        "type": "string",
+                        "description": "The provider-assigned unique ID for this managed resource.\n"
                     },
                     "lastname": {
                         "type": "string"
@@ -6863,10 +6919,10 @@
                         "type": "string"
                     },
                     "locationIds": {
+                        "type": "array",
                         "items": {
                             "type": "integer"
-                        },
-                        "type": "array"
+                        }
                     },
                     "login": {
                         "type": "string"
@@ -6875,15 +6931,16 @@
                         "type": "string"
                     },
                     "organizationIds": {
+                        "type": "array",
                         "items": {
                             "type": "integer"
-                        },
-                        "type": "array"
+                        }
                     },
                     "password": {
                         "type": "string"
                     }
                 },
+                "type": "object",
                 "required": [
                     "admin",
                     "authSourceId",
@@ -6894,8 +6951,7 @@
                     "organizationIds",
                     "password",
                     "id"
-                ],
-                "type": "object"
+                ]
             }
         },
         "foreman:index/getUsergroup:getUsergroup": {
@@ -6918,19 +6974,19 @@
                         "type": "boolean"
                     },
                     "id": {
-                        "description": "The provider-assigned unique ID for this managed resource.\n",
-                        "type": "string"
+                        "type": "string",
+                        "description": "The provider-assigned unique ID for this managed resource.\n"
                     },
                     "name": {
                         "type": "string"
                     }
                 },
+                "type": "object",
                 "required": [
                     "admin",
                     "name",
                     "id"
-                ],
-                "type": "object"
+                ]
             }
         }
     }

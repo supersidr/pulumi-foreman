@@ -201,6 +201,12 @@
                 "fields": {
                     "domain_ids": {
                         "maxItemsOne": false
+                    },
+                    "location_ids": {
+                        "maxItemsOne": false
+                    },
+                    "organization_ids": {
+                        "maxItemsOne": false
                     }
                 }
             },
@@ -425,6 +431,12 @@
                 "majorVersion": 1,
                 "fields": {
                     "domain_ids": {
+                        "maxItemsOne": false
+                    },
+                    "location_ids": {
+                        "maxItemsOne": false
+                    },
+                    "organization_ids": {
                         "maxItemsOne": false
                     }
                 }
