@@ -4342,6 +4342,10 @@
                     "type": "integer",
                     "description": "DHCP Proxy ID to use within this subnet\n"
                 },
+                "dnsId": {
+                    "type": "integer",
+                    "description": "Reverse DNS Proxy ID to use within this subnet\n"
+                },
                 "dnsPrimary": {
                     "type": "string",
                     "description": "Primary DNS server for this subnet.\n"
@@ -4410,6 +4414,13 @@
                         "type": "integer"
                     },
                     "description": "Organizations to assign this subnet to\n"
+                },
+                "remoteExecutionProxyIds": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    },
+                    "description": "Remote Execution Proxy IDs to use within this subnet\n"
                 },
                 "templateId": {
                     "type": "integer",
@@ -4451,6 +4462,10 @@
                     "type": "integer",
                     "description": "DHCP Proxy ID to use within this subnet\n"
                 },
+                "dnsId": {
+                    "type": "integer",
+                    "description": "Reverse DNS Proxy ID to use within this subnet\n"
+                },
                 "dnsPrimary": {
                     "type": "string",
                     "description": "Primary DNS server for this subnet.\n"
@@ -4519,6 +4534,13 @@
                         "type": "integer"
                     },
                     "description": "Organizations to assign this subnet to\n"
+                },
+                "remoteExecutionProxyIds": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    },
+                    "description": "Remote Execution Proxy IDs to use within this subnet\n"
                 },
                 "templateId": {
                     "type": "integer",
@@ -4563,6 +4585,10 @@
                     "dhcpId": {
                         "type": "integer",
                         "description": "DHCP Proxy ID to use within this subnet\n"
+                    },
+                    "dnsId": {
+                        "type": "integer",
+                        "description": "Reverse DNS Proxy ID to use within this subnet\n"
                     },
                     "dnsPrimary": {
                         "type": "string",
@@ -4632,6 +4658,13 @@
                             "type": "integer"
                         },
                         "description": "Organizations to assign this subnet to\n"
+                    },
+                    "remoteExecutionProxyIds": {
+                        "type": "array",
+                        "items": {
+                            "type": "integer"
+                        },
+                        "description": "Remote Execution Proxy IDs to use within this subnet\n"
                     },
                     "templateId": {
                         "type": "integer",
@@ -6666,6 +6699,9 @@
                     "dhcpId": {
                         "type": "integer"
                     },
+                    "dnsId": {
+                        "type": "integer"
+                    },
                     "dnsPrimary": {
                         "type": "string"
                     },
@@ -6724,6 +6760,12 @@
                             "type": "integer"
                         }
                     },
+                    "remoteExecutionProxyIds": {
+                        "type": "array",
+                        "items": {
+                            "type": "integer"
+                        }
+                    },
                     "templateId": {
                         "type": "integer"
                     },
@@ -6743,6 +6785,7 @@
                     "bootMode",
                     "description",
                     "dhcpId",
+                    "dnsId",
                     "dnsPrimary",
                     "dnsSecondary",
                     "domainIds",
@@ -6756,6 +6799,7 @@
                     "networkAddress",
                     "networkType",
                     "organizationIds",
+                    "remoteExecutionProxyIds",
                     "templateId",
                     "tftpId",
                     "to",

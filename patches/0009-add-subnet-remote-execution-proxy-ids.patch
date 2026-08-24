@@ -1,0 +1,79 @@
+diff --git a/foreman/api/subnet.go b/foreman/api/subnet.go
+index 0897e68..c4f9a21 100644
+--- a/foreman/api/subnet.go
++++ b/foreman/api/subnet.go
+@@ -82,6 +82,10 @@ type ForemanSubnet struct {
+ 	OrganizationIDs []int `json:"organization_ids,omitempty"`
+ 	// Organizations (for internal use on read)
+ 	Organizations []Domain `json:"organizations,omitempty"`
++	// Remote Execution Proxy IDs to use within this subnet
++	RemoteExecutionProxyIDs []int `json:"remote_execution_proxy_ids,omitempty"`
++	// Remote Execution Proxies (for internal use on read)
++	RemoteExecutionProxies []Domain `json:"remote_execution_proxies,omitempty"`
+ 	// Network Type
+ 	NetworkType string `json:"network_type"`
+ }
+@@ -160,6 +164,11 @@ func (c *Client) ReadSubnet(ctx context.Context, id int) (*ForemanSubnet, error)
+ 	for _, organization := range readSubnet.Organizations {
+ 		readSubnet.OrganizationIDs = append(readSubnet.OrganizationIDs, organization.ID)
+ 	}
++	if len(readSubnet.RemoteExecutionProxyIDs) == 0 {
++		for _, proxy := range readSubnet.RemoteExecutionProxies {
++			readSubnet.RemoteExecutionProxyIDs = append(readSubnet.RemoteExecutionProxyIDs, proxy.ID)
++		}
++	}
+ 
+ 	log.Debugf("readSubnet: [%+v]", readSubnet)
+ 
+diff --git a/foreman/resource_foreman_subnet.go b/foreman/resource_foreman_subnet.go
+index e34b8e8..a91c7d2 100644
+--- a/foreman/resource_foreman_subnet.go
++++ b/foreman/resource_foreman_subnet.go
+@@ -198,6 +198,14 @@ func resourceForemanSubnet() *schema.Resource {
+ 				Optional:    true,
+ 				Description: "Organizations to assign this subnet to",
+ 			},
++			"remote_execution_proxy_ids": {
++				Type: schema.TypeSet,
++				Elem: &schema.Schema{
++					Type: schema.TypeInt,
++				},
++				Optional:    true,
++				Description: "Remote Execution Proxy IDs to use within this subnet",
++			},
+ 			"network_type": {
+ 				Type:     schema.TypeString,
+ 				Optional: true,
+@@ -304,6 +312,10 @@ func buildForemanSubnet(d *schema.ResourceData) *api.ForemanSubnet {
+ 		attrSet := attr.(*schema.Set)
+ 		s.OrganizationIDs = conv.InterfaceSliceToIntSlice(attrSet.List())
+ 	}
++	if attr, ok = d.GetOk("remote_execution_proxy_ids"); ok {
++		attrSet := attr.(*schema.Set)
++		s.RemoteExecutionProxyIDs = conv.InterfaceSliceToIntSlice(attrSet.List())
++	}
+ 	if attr, ok = d.GetOk("network_type"); ok {
+ 		s.NetworkType = attr.(string)
+ 	}
+@@ -342,6 +354,12 @@ func setResourceDataFromForemanSubnet(d *schema.ResourceData, fs *api.ForemanSub
+ 	d.Set("domain_ids", fs.DomainIDs)
+ 	d.Set("location_ids", fs.LocationIDs)
+ 	d.Set("organization_ids", fs.OrganizationIDs)
++	if len(fs.RemoteExecutionProxyIDs) == 0 {
++		for _, proxy := range fs.RemoteExecutionProxies {
++			fs.RemoteExecutionProxyIDs = append(fs.RemoteExecutionProxyIDs, proxy.ID)
++		}
++	}
++	d.Set("remote_execution_proxy_ids", fs.RemoteExecutionProxyIDs)
+ 	d.Set("network_type", fs.NetworkType)
+ 	d.Set("description", fs.Description)
+ }
+@@ -373,6 +391,8 @@ func resourceForemanSubnetCreate(ctx context.Context, d *schema.ResourceData, me
+ 		createdSubnet.DomainIDs = domainIDs
+ 		createdSubnet.LocationIDs = s.LocationIDs
+ 		createdSubnet.OrganizationIDs = s.OrganizationIDs
++		createdSubnet.RemoteExecutionProxyIDs = s.RemoteExecutionProxyIDs
++		createdSubnet.RemoteExecutionProxies = nil
+ 
+ 		updatedSubnet, updateErr := client.UpdateSubnet(ctx, createdSubnet)
+ 		if updateErr != nil {

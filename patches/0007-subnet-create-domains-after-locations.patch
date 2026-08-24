@@ -1,0 +1,53 @@
+diff --git a/foreman/api/subnet.go b/foreman/api/subnet.go
+index 9057afc..f920ba8 100644
+--- a/foreman/api/subnet.go
++++ b/foreman/api/subnet.go
+@@ -69,9 +69,9 @@ type ForemanSubnet struct {
+ 	// HTTP Boot ID
+ 	HTTPBootID *int `json:"httpboot_id"`
+ 	// Domain IDs
+-	DomainIDs []int `json:"domain_ids"`
+-	// Domains (for internal use)
+-	Domains []Domain `json:"domains"`
++	DomainIDs []int `json:"domain_ids,omitempty"`
++	// Domains (for internal use on read; omit on write to avoid "domains":null)
++	Domains []Domain `json:"domains,omitempty"`
+ 	// Location IDs assigned to this subnet
+ 	LocationIDs []int `json:"location_ids,omitempty"`
+ 	// Locations (for internal use on read)
+diff --git a/foreman/resource_foreman_subnet.go b/foreman/resource_foreman_subnet.go
+index 174fe6b..a843458 100644
+--- a/foreman/resource_foreman_subnet.go
++++ b/foreman/resource_foreman_subnet.go
+@@ -347,6 +347,11 @@ func resourceForemanSubnetCreate(ctx context.Context, d *schema.ResourceData, me
+ 
+ 	log.Debugf("ForemanSubnet: [%+v]", s)
+ 
++	// Foreman validates domain taxonomy against the subnet's locations/organizations.
++	// Create the subnet with locations first, then attach domains on update.
++	domainIDs := s.DomainIDs
++	s.DomainIDs = nil
++
+ 	createdSubnet, createErr := client.CreateSubnet(ctx, s)
+ 	if createErr != nil {
+ 		return diag.FromErr(createErr)
+@@ -354,6 +359,19 @@ func resourceForemanSubnetCreate(ctx context.Context, d *schema.ResourceData, me
+ 
+ 	log.Debugf("Created ForemanSubnet: [%+v]", createdSubnet)
+ 
++	if len(domainIDs) > 0 {
++		createdSubnet.DomainIDs = domainIDs
++		createdSubnet.LocationIDs = s.LocationIDs
++		createdSubnet.OrganizationIDs = s.OrganizationIDs
++
++		updatedSubnet, updateErr := client.UpdateSubnet(ctx, createdSubnet)
++		if updateErr != nil {
++			return diag.FromErr(fmt.Errorf("subnet created, but failed to attach domains: %w", updateErr))
++		}
++		createdSubnet = updatedSubnet
++		log.Debugf("Updated ForemanSubnet with domains: [%+v]", createdSubnet)
++	}
++
+ 	setResourceDataFromForemanSubnet(d, createdSubnet)
+ 
+ 	return nil

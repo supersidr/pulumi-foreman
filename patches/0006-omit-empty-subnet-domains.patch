@@ -1,0 +1,15 @@
+diff --git a/foreman/api/subnet.go b/foreman/api/subnet.go
+index 9057afc..09a8061 100644
+--- a/foreman/api/subnet.go
++++ b/foreman/api/subnet.go
+@@ -70,8 +70,8 @@ type ForemanSubnet struct {
+ 	HTTPBootID *int `json:"httpboot_id"`
+ 	// Domain IDs
+ 	DomainIDs []int `json:"domain_ids"`
+-	// Domains (for internal use)
+-	Domains []Domain `json:"domains"`
++	// Domains (for internal use on read; omit on write to avoid "domains":null)
++	Domains []Domain `json:"domains,omitempty"`
+ 	// Location IDs assigned to this subnet
+ 	LocationIDs []int `json:"location_ids,omitempty"`
+ 	// Locations (for internal use on read)

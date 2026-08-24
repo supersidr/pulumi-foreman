@@ -1,0 +1,87 @@
+diff --git a/foreman/api/subnet.go b/foreman/api/subnet.go
+index 9057afc..0897e68 100644
+--- a/foreman/api/subnet.go
++++ b/foreman/api/subnet.go
+@@ -68,10 +68,12 @@ type ForemanSubnet struct {
+ 	TftpID *int `json:"tftp_id"`
+ 	// HTTP Boot ID
+ 	HTTPBootID *int `json:"httpboot_id"`
++	// Reverse DNS Proxy ID
++	DnsID *int `json:"dns_id"`
+ 	// Domain IDs
+-	DomainIDs []int `json:"domain_ids"`
+-	// Domains (for internal use)
+-	Domains []Domain `json:"domains"`
++	DomainIDs []int `json:"domain_ids,omitempty"`
++	// Domains (for internal use on read; omit on write to avoid "domains":null)
++	Domains []Domain `json:"domains,omitempty"`
+ 	// Location IDs assigned to this subnet
+ 	LocationIDs []int `json:"location_ids,omitempty"`
+ 	// Locations (for internal use on read)
+diff --git a/foreman/resource_foreman_subnet.go b/foreman/resource_foreman_subnet.go
+index 174fe6b..e34b8e8 100644
+--- a/foreman/resource_foreman_subnet.go
++++ b/foreman/resource_foreman_subnet.go
+@@ -169,6 +169,11 @@ func resourceForemanSubnet() *schema.Resource {
+ 				Optional:    true,
+ 				Description: "HTTPBoot Proxy ID to use within this subnet",
+ 			},
++			"dns_id": {
++				Type:        schema.TypeInt,
++				Optional:    true,
++				Description: "Reverse DNS Proxy ID to use within this subnet",
++			},
+ 			"domain_ids": {
+ 				Type: schema.TypeSet,
+ 				Elem: &schema.Schema{
+@@ -283,6 +288,10 @@ func buildForemanSubnet(d *schema.ResourceData) *api.ForemanSubnet {
+ 		httpBootID := attr.(int)
+ 		s.HTTPBootID = &httpBootID
+ 	}
++	if attr, ok = d.GetOk("dns_id"); ok {
++		dnsID := attr.(int)
++		s.DnsID = &dnsID
++	}
+ 	if attr, ok = d.GetOk("domain_ids"); ok {
+ 		attrSet := attr.(*schema.Set)
+ 		s.DomainIDs = conv.InterfaceSliceToIntSlice(attrSet.List())
+@@ -328,6 +337,7 @@ func setResourceDataFromForemanSubnet(d *schema.ResourceData, fs *api.ForemanSub
+ 	d.Set("bmc_id", fs.BmcID)
+ 	d.Set("tftp_id", fs.TftpID)
+ 	d.Set("httpboot_id", fs.HTTPBootID)
++	d.Set("dns_id", fs.DnsID)
+ 	d.Set("domain_ids", fs.DomainIDs)
+ 	d.Set("location_ids", fs.LocationIDs)
+ 	d.Set("organization_ids", fs.OrganizationIDs)
+@@ -347,6 +357,11 @@ func resourceForemanSubnetCreate(ctx context.Context, d *schema.ResourceData, me
+ 
+ 	log.Debugf("ForemanSubnet: [%+v]", s)
+ 
++	// Foreman validates domain taxonomy against the subnet's locations/organizations.
++	// Create the subnet with locations first, then attach domains on update.
++	domainIDs := s.DomainIDs
++	s.DomainIDs = nil
++
+ 	createdSubnet, createErr := client.CreateSubnet(ctx, s)
+ 	if createErr != nil {
+ 		return diag.FromErr(createErr)
+@@ -354,6 +369,19 @@ func resourceForemanSubnetCreate(ctx context.Context, d *schema.ResourceData, me
+ 
+ 	log.Debugf("Created ForemanSubnet: [%+v]", createdSubnet)
+ 
++	if len(domainIDs) > 0 {
++		createdSubnet.DomainIDs = domainIDs
++		createdSubnet.LocationIDs = s.LocationIDs
++		createdSubnet.OrganizationIDs = s.OrganizationIDs
++
++		updatedSubnet, updateErr := client.UpdateSubnet(ctx, createdSubnet)
++		if updateErr != nil {
++			return diag.FromErr(fmt.Errorf("subnet created, but failed to attach domains: %w", updateErr))
++		}
++		createdSubnet = updatedSubnet
++		log.Debugf("Updated ForemanSubnet with domains: [%+v]", createdSubnet)
++	}
++
+ 	setResourceDataFromForemanSubnet(d, createdSubnet)
+ 
+ 	return nil

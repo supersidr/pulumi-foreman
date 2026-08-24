@@ -1,6 +1,6 @@
 Metadata-Version: 2.4
 Name: pulumi_foreman
-Version: 1.0.5
+Version: 1.0.10
 Summary: A Pulumi package for creating and managing foreman cloud resources.
 License: Apache-2.0
 Project-URL: Homepage, https://www.pulumi.com

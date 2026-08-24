@@ -25,11 +25,13 @@ class SubnetArgs:
                  boot_mode: Optional[pulumi.Input[str]] = None,
                  description: Optional[pulumi.Input[str]] = None,
                  dhcp_id: Optional[pulumi.Input[int]] = None,
+            dns_id: Optional[pulumi.Input[int]] = None,
                  dns_primary: Optional[pulumi.Input[str]] = None,
                  dns_secondary: Optional[pulumi.Input[str]] = None,
                  domain_ids: Optional[pulumi.Input[Sequence[pulumi.Input[int]]]] = None,
                  location_ids: Optional[pulumi.Input[Sequence[pulumi.Input[int]]]] = None,
                  organization_ids: Optional[pulumi.Input[Sequence[pulumi.Input[int]]]] = None,
+                 remote_execution_proxy_ids: Optional[pulumi.Input[Sequence[pulumi.Input[int]]]] = None,
                  from_: Optional[pulumi.Input[str]] = None,
                  gateway: Optional[pulumi.Input[str]] = None,
                  httpboot_id: Optional[pulumi.Input[int]] = None,
@@ -50,11 +52,13 @@ class SubnetArgs:
         :param pulumi.Input[str] boot_mode: Default boot mode for instances assigned to this subnet. Values include: `"Static"`, `"DHCP"`.
         :param pulumi.Input[str] description: Description of the subnet
         :param pulumi.Input[int] dhcp_id: DHCP Proxy ID to use within this subnet
+        :param pulumi.Input[int] dns_id: Reverse DNS Proxy ID to use within this subnet
         :param pulumi.Input[str] dns_primary: Primary DNS server for this subnet.
         :param pulumi.Input[str] dns_secondary: Secondary DNS sever for this subnet.
         :param pulumi.Input[Sequence[pulumi.Input[int]]] domain_ids: Domains in which this subnet is part
         :param pulumi.Input[Sequence[pulumi.Input[int]]] location_ids: Locations to assign this subnet to
         :param pulumi.Input[Sequence[pulumi.Input[int]]] organization_ids: Organizations to assign this subnet to
+        :param pulumi.Input[Sequence[pulumi.Input[int]]] remote_execution_proxy_ids: Remote Execution Proxy IDs to use within this subnet
         :param pulumi.Input[str] from_: Start IP address for IP auto suggestion.
         :param pulumi.Input[str] gateway: Gateway server to use when connecting/communicating to anything not on the same network.
         :param pulumi.Input[int] httpboot_id: HTTPBoot Proxy ID to use within this subnet
@@ -78,6 +82,8 @@ class SubnetArgs:
             pulumi.set(__self__, "description", description)
         if dhcp_id is not None:
             pulumi.set(__self__, "dhcp_id", dhcp_id)
+        if dns_id is not None:
+            pulumi.set(__self__, "dns_id", dns_id)
         if dns_primary is not None:
             pulumi.set(__self__, "dns_primary", dns_primary)
         if dns_secondary is not None:
@@ -88,6 +94,8 @@ class SubnetArgs:
             pulumi.set(__self__, "location_ids", location_ids)
         if organization_ids is not None:
             pulumi.set(__self__, "organization_ids", organization_ids)
+        if remote_execution_proxy_ids is not None:
+            pulumi.set(__self__, "remote_execution_proxy_ids", remote_execution_proxy_ids)
         if from_ is not None:
             pulumi.set(__self__, "from_", from_)
         if gateway is not None:
@@ -186,6 +194,19 @@ class SubnetArgs:
         pulumi.set(self, "dhcp_id", value)
 
     @property
+    @pulumi.getter(name="dnsId")
+    def dns_id(self) -> Optional[pulumi.Input[int]]:
+        """
+        Reverse DNS Proxy ID to use within this subnet
+        """
+        return pulumi.get(self, "dns_id")
+
+    @dns_id.setter
+    def dns_id(self, value: Optional[pulumi.Input[int]]):
+        pulumi.set(self, "dns_id", value)
+
+
+    @property
     @pulumi.getter(name="dnsPrimary")
     def dns_primary(self) -> Optional[pulumi.Input[str]]:
         """
@@ -244,6 +265,18 @@ class SubnetArgs:
     @organization_ids.setter
     def organization_ids(self, value: Optional[pulumi.Input[Sequence[pulumi.Input[int]]]]):
         pulumi.set(self, "organization_ids", value)
+
+    @property
+    @pulumi.getter(name="remoteExecutionProxyIds")
+    def remote_execution_proxy_ids(self) -> Optional[pulumi.Input[Sequence[pulumi.Input[int]]]]:
+        """
+        Remote Execution Proxy IDs to use within this subnet
+        """
+        return pulumi.get(self, "remote_execution_proxy_ids")
+
+    @remote_execution_proxy_ids.setter
+    def remote_execution_proxy_ids(self, value: Optional[pulumi.Input[Sequence[pulumi.Input[int]]]]):
+        pulumi.set(self, "remote_execution_proxy_ids", value)
 
 
     @property
@@ -399,11 +432,13 @@ class _SubnetState:
                  boot_mode: Optional[pulumi.Input[str]] = None,
                  description: Optional[pulumi.Input[str]] = None,
                  dhcp_id: Optional[pulumi.Input[int]] = None,
+            dns_id: Optional[pulumi.Input[int]] = None,
                  dns_primary: Optional[pulumi.Input[str]] = None,
                  dns_secondary: Optional[pulumi.Input[str]] = None,
                  domain_ids: Optional[pulumi.Input[Sequence[pulumi.Input[int]]]] = None,
                  location_ids: Optional[pulumi.Input[Sequence[pulumi.Input[int]]]] = None,
                  organization_ids: Optional[pulumi.Input[Sequence[pulumi.Input[int]]]] = None,
+                 remote_execution_proxy_ids: Optional[pulumi.Input[Sequence[pulumi.Input[int]]]] = None,
                  from_: Optional[pulumi.Input[str]] = None,
                  gateway: Optional[pulumi.Input[str]] = None,
                  httpboot_id: Optional[pulumi.Input[int]] = None,
@@ -425,11 +460,13 @@ class _SubnetState:
         :param pulumi.Input[str] boot_mode: Default boot mode for instances assigned to this subnet. Values include: `"Static"`, `"DHCP"`.
         :param pulumi.Input[str] description: Description of the subnet
         :param pulumi.Input[int] dhcp_id: DHCP Proxy ID to use within this subnet
+        :param pulumi.Input[int] dns_id: Reverse DNS Proxy ID to use within this subnet
         :param pulumi.Input[str] dns_primary: Primary DNS server for this subnet.
         :param pulumi.Input[str] dns_secondary: Secondary DNS sever for this subnet.
         :param pulumi.Input[Sequence[pulumi.Input[int]]] domain_ids: Domains in which this subnet is part
         :param pulumi.Input[Sequence[pulumi.Input[int]]] location_ids: Locations to assign this subnet to
         :param pulumi.Input[Sequence[pulumi.Input[int]]] organization_ids: Organizations to assign this subnet to
+        :param pulumi.Input[Sequence[pulumi.Input[int]]] remote_execution_proxy_ids: Remote Execution Proxy IDs to use within this subnet
         :param pulumi.Input[str] from_: Start IP address for IP auto suggestion.
         :param pulumi.Input[str] gateway: Gateway server to use when connecting/communicating to anything not on the same network.
         :param pulumi.Input[int] httpboot_id: HTTPBoot Proxy ID to use within this subnet
@@ -455,6 +492,8 @@ class _SubnetState:
             pulumi.set(__self__, "description", description)
         if dhcp_id is not None:
             pulumi.set(__self__, "dhcp_id", dhcp_id)
+        if dns_id is not None:
+            pulumi.set(__self__, "dns_id", dns_id)
         if dns_primary is not None:
             pulumi.set(__self__, "dns_primary", dns_primary)
         if dns_secondary is not None:
@@ -465,6 +504,8 @@ class _SubnetState:
             pulumi.set(__self__, "location_ids", location_ids)
         if organization_ids is not None:
             pulumi.set(__self__, "organization_ids", organization_ids)
+        if remote_execution_proxy_ids is not None:
+            pulumi.set(__self__, "remote_execution_proxy_ids", remote_execution_proxy_ids)
         if from_ is not None:
             pulumi.set(__self__, "from_", from_)
         if gateway is not None:
@@ -555,6 +596,19 @@ class _SubnetState:
         pulumi.set(self, "dhcp_id", value)
 
     @property
+    @pulumi.getter(name="dnsId")
+    def dns_id(self) -> Optional[pulumi.Input[int]]:
+        """
+        Reverse DNS Proxy ID to use within this subnet
+        """
+        return pulumi.get(self, "dns_id")
+
+    @dns_id.setter
+    def dns_id(self, value: Optional[pulumi.Input[int]]):
+        pulumi.set(self, "dns_id", value)
+
+
+    @property
     @pulumi.getter(name="dnsPrimary")
     def dns_primary(self) -> Optional[pulumi.Input[str]]:
         """
@@ -613,6 +667,18 @@ class _SubnetState:
     @organization_ids.setter
     def organization_ids(self, value: Optional[pulumi.Input[Sequence[pulumi.Input[int]]]]):
         pulumi.set(self, "organization_ids", value)
+
+    @property
+    @pulumi.getter(name="remoteExecutionProxyIds")
+    def remote_execution_proxy_ids(self) -> Optional[pulumi.Input[Sequence[pulumi.Input[int]]]]:
+        """
+        Remote Execution Proxy IDs to use within this subnet
+        """
+        return pulumi.get(self, "remote_execution_proxy_ids")
+
+    @remote_execution_proxy_ids.setter
+    def remote_execution_proxy_ids(self, value: Optional[pulumi.Input[Sequence[pulumi.Input[int]]]]):
+        pulumi.set(self, "remote_execution_proxy_ids", value)
 
 
     @property
@@ -793,11 +859,13 @@ class Subnet(pulumi.CustomResource):
                  boot_mode: Optional[pulumi.Input[str]] = None,
                  description: Optional[pulumi.Input[str]] = None,
                  dhcp_id: Optional[pulumi.Input[int]] = None,
+            dns_id: Optional[pulumi.Input[int]] = None,
                  dns_primary: Optional[pulumi.Input[str]] = None,
                  dns_secondary: Optional[pulumi.Input[str]] = None,
                  domain_ids: Optional[pulumi.Input[Sequence[pulumi.Input[int]]]] = None,
                  location_ids: Optional[pulumi.Input[Sequence[pulumi.Input[int]]]] = None,
                  organization_ids: Optional[pulumi.Input[Sequence[pulumi.Input[int]]]] = None,
+                 remote_execution_proxy_ids: Optional[pulumi.Input[Sequence[pulumi.Input[int]]]] = None,
                  from_: Optional[pulumi.Input[str]] = None,
                  gateway: Optional[pulumi.Input[str]] = None,
                  httpboot_id: Optional[pulumi.Input[int]] = None,
@@ -821,11 +889,13 @@ class Subnet(pulumi.CustomResource):
         :param pulumi.Input[str] boot_mode: Default boot mode for instances assigned to this subnet. Values include: `"Static"`, `"DHCP"`.
         :param pulumi.Input[str] description: Description of the subnet
         :param pulumi.Input[int] dhcp_id: DHCP Proxy ID to use within this subnet
+        :param pulumi.Input[int] dns_id: Reverse DNS Proxy ID to use within this subnet
         :param pulumi.Input[str] dns_primary: Primary DNS server for this subnet.
         :param pulumi.Input[str] dns_secondary: Secondary DNS sever for this subnet.
         :param pulumi.Input[Sequence[pulumi.Input[int]]] domain_ids: Domains in which this subnet is part
         :param pulumi.Input[Sequence[pulumi.Input[int]]] location_ids: Locations to assign this subnet to
         :param pulumi.Input[Sequence[pulumi.Input[int]]] organization_ids: Organizations to assign this subnet to
+        :param pulumi.Input[Sequence[pulumi.Input[int]]] remote_execution_proxy_ids: Remote Execution Proxy IDs to use within this subnet
         :param pulumi.Input[str] from_: Start IP address for IP auto suggestion.
         :param pulumi.Input[str] gateway: Gateway server to use when connecting/communicating to anything not on the same network.
         :param pulumi.Input[int] httpboot_id: HTTPBoot Proxy ID to use within this subnet
@@ -868,11 +938,13 @@ class Subnet(pulumi.CustomResource):
                  boot_mode: Optional[pulumi.Input[str]] = None,
                  description: Optional[pulumi.Input[str]] = None,
                  dhcp_id: Optional[pulumi.Input[int]] = None,
+            dns_id: Optional[pulumi.Input[int]] = None,
                  dns_primary: Optional[pulumi.Input[str]] = None,
                  dns_secondary: Optional[pulumi.Input[str]] = None,
                  domain_ids: Optional[pulumi.Input[Sequence[pulumi.Input[int]]]] = None,
                  location_ids: Optional[pulumi.Input[Sequence[pulumi.Input[int]]]] = None,
                  organization_ids: Optional[pulumi.Input[Sequence[pulumi.Input[int]]]] = None,
+                 remote_execution_proxy_ids: Optional[pulumi.Input[Sequence[pulumi.Input[int]]]] = None,
                  from_: Optional[pulumi.Input[str]] = None,
                  gateway: Optional[pulumi.Input[str]] = None,
                  httpboot_id: Optional[pulumi.Input[int]] = None,
@@ -900,11 +972,13 @@ class Subnet(pulumi.CustomResource):
             __props__.__dict__["boot_mode"] = boot_mode
             __props__.__dict__["description"] = description
             __props__.__dict__["dhcp_id"] = dhcp_id
+            __props__.__dict__["dns_id"] = dns_id
             __props__.__dict__["dns_primary"] = dns_primary
             __props__.__dict__["dns_secondary"] = dns_secondary
             __props__.__dict__["domain_ids"] = domain_ids
             __props__.__dict__["location_ids"] = location_ids
             __props__.__dict__["organization_ids"] = organization_ids
+            __props__.__dict__["remote_execution_proxy_ids"] = remote_execution_proxy_ids
             __props__.__dict__["from_"] = from_
             __props__.__dict__["gateway"] = gateway
             __props__.__dict__["httpboot_id"] = httpboot_id
@@ -939,11 +1013,13 @@ class Subnet(pulumi.CustomResource):
             boot_mode: Optional[pulumi.Input[str]] = None,
             description: Optional[pulumi.Input[str]] = None,
             dhcp_id: Optional[pulumi.Input[int]] = None,
+            dns_id: Optional[pulumi.Input[int]] = None,
             dns_primary: Optional[pulumi.Input[str]] = None,
             dns_secondary: Optional[pulumi.Input[str]] = None,
             domain_ids: Optional[pulumi.Input[Sequence[pulumi.Input[int]]]] = None,
             location_ids: Optional[pulumi.Input[Sequence[pulumi.Input[int]]]] = None,
             organization_ids: Optional[pulumi.Input[Sequence[pulumi.Input[int]]]] = None,
+            remote_execution_proxy_ids: Optional[pulumi.Input[Sequence[pulumi.Input[int]]]] = None,
             from_: Optional[pulumi.Input[str]] = None,
             gateway: Optional[pulumi.Input[str]] = None,
             httpboot_id: Optional[pulumi.Input[int]] = None,
@@ -970,11 +1046,13 @@ class Subnet(pulumi.CustomResource):
         :param pulumi.Input[str] boot_mode: Default boot mode for instances assigned to this subnet. Values include: `"Static"`, `"DHCP"`.
         :param pulumi.Input[str] description: Description of the subnet
         :param pulumi.Input[int] dhcp_id: DHCP Proxy ID to use within this subnet
+        :param pulumi.Input[int] dns_id: Reverse DNS Proxy ID to use within this subnet
         :param pulumi.Input[str] dns_primary: Primary DNS server for this subnet.
         :param pulumi.Input[str] dns_secondary: Secondary DNS sever for this subnet.
         :param pulumi.Input[Sequence[pulumi.Input[int]]] domain_ids: Domains in which this subnet is part
         :param pulumi.Input[Sequence[pulumi.Input[int]]] location_ids: Locations to assign this subnet to
         :param pulumi.Input[Sequence[pulumi.Input[int]]] organization_ids: Organizations to assign this subnet to
+        :param pulumi.Input[Sequence[pulumi.Input[int]]] remote_execution_proxy_ids: Remote Execution Proxy IDs to use within this subnet
         :param pulumi.Input[str] from_: Start IP address for IP auto suggestion.
         :param pulumi.Input[str] gateway: Gateway server to use when connecting/communicating to anything not on the same network.
         :param pulumi.Input[int] httpboot_id: HTTPBoot Proxy ID to use within this subnet
@@ -999,11 +1077,13 @@ class Subnet(pulumi.CustomResource):
         __props__.__dict__["boot_mode"] = boot_mode
         __props__.__dict__["description"] = description
         __props__.__dict__["dhcp_id"] = dhcp_id
+        __props__.__dict__["dns_id"] = dns_id
         __props__.__dict__["dns_primary"] = dns_primary
         __props__.__dict__["dns_secondary"] = dns_secondary
         __props__.__dict__["domain_ids"] = domain_ids
         __props__.__dict__["location_ids"] = location_ids
         __props__.__dict__["organization_ids"] = organization_ids
+        __props__.__dict__["remote_execution_proxy_ids"] = remote_execution_proxy_ids
         __props__.__dict__["from_"] = from_
         __props__.__dict__["gateway"] = gateway
         __props__.__dict__["httpboot_id"] = httpboot_id
@@ -1061,6 +1141,15 @@ class Subnet(pulumi.CustomResource):
         return pulumi.get(self, "dhcp_id")
 
     @property
+    @pulumi.getter(name="dnsId")
+    def dns_id(self) -> pulumi.Output[Optional[int]]:
+        """
+        Reverse DNS Proxy ID to use within this subnet
+        """
+        return pulumi.get(self, "dns_id")
+
+
+    @property
     @pulumi.getter(name="dnsPrimary")
     def dns_primary(self) -> pulumi.Output[Optional[str]]:
         """
@@ -1099,6 +1188,14 @@ class Subnet(pulumi.CustomResource):
         Organizations to assign this subnet to
         """
         return pulumi.get(self, "organization_ids")
+
+    @property
+    @pulumi.getter(name="remoteExecutionProxyIds")
+    def remote_execution_proxy_ids(self) -> pulumi.Output[Optional[Sequence[int]]]:
+        """
+        Remote Execution Proxy IDs to use within this subnet
+        """
+        return pulumi.get(self, "remote_execution_proxy_ids")
 
 
     @property
