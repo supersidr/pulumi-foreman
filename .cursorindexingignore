@@ -1,0 +1,6 @@
+sdk/nodejs/
+sdk/dotnet/
+sdk/go/
+sdk/java/
+sdk/python/build/
+provider/cmd/pulumi-resource-foreman/schema.json
