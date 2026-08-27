@@ -125,6 +125,10 @@
                 "current": "foreman:index/katelloSyncPlan:KatelloSyncPlan",
                 "majorVersion": 1
             },
+            "foreman_location": {
+                "current": "foreman:index/location:Location",
+                "majorVersion": 1
+            },
             "foreman_media": {
                 "current": "foreman:index/media:Media",
                 "majorVersion": 1,
@@ -155,6 +159,10 @@
                         "maxItemsOne": false
                     }
                 }
+            },
+            "foreman_organization": {
+                "current": "foreman:index/organization:Organization",
+                "majorVersion": 1
             },
             "foreman_override_value": {
                 "current": "foreman:index/overrideValue:OverrideValue",
@@ -206,6 +214,9 @@
                         "maxItemsOne": false
                     },
                     "organization_ids": {
+                        "maxItemsOne": false
+                    },
+                    "remote_execution_proxy_ids": {
                         "maxItemsOne": false
                     }
                 }
@@ -348,6 +359,10 @@
                 "current": "foreman:index/getKatelloSyncPlan:getKatelloSyncPlan",
                 "majorVersion": 1
             },
+            "foreman_location": {
+                "current": "foreman:index/getLocation:getLocation",
+                "majorVersion": 1
+            },
             "foreman_media": {
                 "current": "foreman:index/getMedia:getMedia",
                 "majorVersion": 1,
@@ -378,6 +393,10 @@
                         "maxItemsOne": false
                     }
                 }
+            },
+            "foreman_organization": {
+                "current": "foreman:index/getOrganization:getOrganization",
+                "majorVersion": 1
             },
             "foreman_parameter": {
                 "current": "foreman:index/getParameter:getParameter",
@@ -437,6 +456,9 @@
                         "maxItemsOne": false
                     },
                     "organization_ids": {
+                        "maxItemsOne": false
+                    },
+                    "remote_execution_proxy_ids": {
                         "maxItemsOne": false
                     }
                 }

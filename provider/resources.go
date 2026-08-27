@@ -192,6 +192,12 @@ func Provider() tfbridge.ProviderInfo {
 					"__meta__": {Omit: true},
 				},
 			},
+			"foreman_location": {
+				Fields: map[string]*tfbridge.SchemaInfo{
+					"__meta_":  {Omit: true},
+					"__meta__": {Omit: true},
+				},
+			},
 			"foreman_global_parameter": {
 				// Tok: ForemanDataSource(mainMod, "getEnvironment"),
 				Fields: map[string]*tfbridge.SchemaInfo{
@@ -314,6 +320,12 @@ func Provider() tfbridge.ProviderInfo {
 				Fields: map[string]*tfbridge.SchemaInfo{
 					// HACK: remove this field for now as it breaks dotnet codegen due to our current type naming strategy.
 					// https://github.com/pulumi/pulumi-terraform-bridge/issues/1118
+					"__meta_":  {Omit: true},
+					"__meta__": {Omit: true},
+				},
+			},
+			"foreman_organization": {
+				Fields: map[string]*tfbridge.SchemaInfo{
 					"__meta_":  {Omit: true},
 					"__meta__": {Omit: true},
 				},

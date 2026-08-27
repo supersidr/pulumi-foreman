@@ -1,0 +1,1947 @@
+diff --git a/foreman/api/location.go b/foreman/api/location.go
+new file mode 100644
+index 0000000..ac4b2cb
+--- /dev/null
++++ b/foreman/api/location.go
+@@ -0,0 +1,212 @@
++package api
++
++import (
++	"bytes"
++	"context"
++	"encoding/json"
++	"fmt"
++	"net/http"
++
++	"github.com/HanseMerkur/terraform-provider-utils/log"
++)
++
++const (
++	LocationEndpointPrefix = "locations"
++)
++
++// -----------------------------------------------------------------------------
++// Struct Definition and Helpers
++// -----------------------------------------------------------------------------
++
++// The ForemanLocation API model represents a Foreman location (taxonomy).
++type ForemanLocation struct {
++	// Inherits the base object's attributes
++	ForemanObject
++
++	// Full ancestry path of the location (computed by Foreman)
++	Title string `json:"title,omitempty"`
++	// Optional human-readable description
++	Description string `json:"description,omitempty"`
++	// ID of the parent location, if nested
++	ParentID int `json:"parent_id,omitempty"`
++	// Name of the parent location (read-only)
++	ParentName string `json:"parent_name,omitempty"`
++}
++
++// -----------------------------------------------------------------------------
++// CRUD Implementation
++// -----------------------------------------------------------------------------
++
++// CreateLocation creates a new ForemanLocation with the attributes of the
++// supplied ForemanLocation reference and returns the created ForemanLocation
++// reference. The returned reference will have its ID and other API default
++// values set by this function.
++func (c *Client) CreateLocation(ctx context.Context, l *ForemanLocation) (*ForemanLocation, error) {
++	log.Tracef("foreman/api/location.go#Create")
++
++	reqEndpoint := fmt.Sprintf("/%s", LocationEndpointPrefix)
++
++	locationJSONBytes, jsonEncErr := c.WrapJSON("location", l)
++	if jsonEncErr != nil {
++		return nil, jsonEncErr
++	}
++
++	log.Debugf("locationJSONBytes: [%s]", locationJSONBytes)
++
++	req, reqErr := c.NewRequestWithContext(
++		ctx,
++		http.MethodPost,
++		reqEndpoint,
++		bytes.NewBuffer(locationJSONBytes),
++	)
++	if reqErr != nil {
++		return nil, reqErr
++	}
++
++	var createdLocation ForemanLocation
++	sendErr := c.SendAndParse(req, &createdLocation)
++	if sendErr != nil {
++		return nil, sendErr
++	}
++
++	log.Debugf("createdLocation: [%+v]", createdLocation)
++
++	return &createdLocation, nil
++}
++
++// ReadLocation reads the attributes of a ForemanLocation identified by the
++// supplied ID and returns a ForemanLocation reference.
++func (c *Client) ReadLocation(ctx context.Context, id int) (*ForemanLocation, error) {
++	log.Tracef("foreman/api/location.go#Read")
++
++	reqEndpoint := fmt.Sprintf("/%s/%d", LocationEndpointPrefix, id)
++
++	req, reqErr := c.NewRequestWithContext(
++		ctx,
++		http.MethodGet,
++		reqEndpoint,
++		nil,
++	)
++	if reqErr != nil {
++		return nil, reqErr
++	}
++
++	var readLocation ForemanLocation
++	sendErr := c.SendAndParse(req, &readLocation)
++	if sendErr != nil {
++		return nil, sendErr
++	}
++
++	log.Debugf("readLocation: [%+v]", readLocation)
++
++	return &readLocation, nil
++}
++
++// UpdateLocation updates a ForemanLocation's attributes. The location with the
++// ID of the supplied ForemanLocation will be updated. A new ForemanLocation
++// reference is returned with the attributes from the result of the update
++// operation.
++func (c *Client) UpdateLocation(ctx context.Context, l *ForemanLocation) (*ForemanLocation, error) {
++	log.Tracef("foreman/api/location.go#Update")
++
++	reqEndpoint := fmt.Sprintf("/%s/%d", LocationEndpointPrefix, l.Id)
++
++	locationJSONBytes, jsonEncErr := c.WrapJSON("location", l)
++	if jsonEncErr != nil {
++		return nil, jsonEncErr
++	}
++
++	log.Debugf("locationJSONBytes: [%s]", locationJSONBytes)
++
++	req, reqErr := c.NewRequestWithContext(
++		ctx,
++		http.MethodPut,
++		reqEndpoint,
++		bytes.NewBuffer(locationJSONBytes),
++	)
++	if reqErr != nil {
++		return nil, reqErr
++	}
++
++	var updatedLocation ForemanLocation
++	sendErr := c.SendAndParse(req, &updatedLocation)
++	if sendErr != nil {
++		return nil, sendErr
++	}
++
++	log.Debugf("updatedLocation: [%+v]", updatedLocation)
++
++	return &updatedLocation, nil
++}
++
++// DeleteLocation deletes the ForemanLocation identified by the supplied ID
++func (c *Client) DeleteLocation(ctx context.Context, id int) error {
++	log.Tracef("foreman/api/location.go#Delete")
++
++	reqEndpoint := fmt.Sprintf("/%s/%d", LocationEndpointPrefix, id)
++
++	req, reqErr := c.NewRequestWithContext(
++		ctx,
++		http.MethodDelete,
++		reqEndpoint,
++		nil,
++	)
++	if reqErr != nil {
++		return reqErr
++	}
++
++	return c.SendAndParse(req, nil)
++}
++
++// -----------------------------------------------------------------------------
++// Query Implementation
++// -----------------------------------------------------------------------------
++
++// QueryLocation queries for a ForemanLocation based on the attributes of the
++// supplied ForemanLocation reference and returns a QueryResponse struct
++// containing query/response metadata and the matching locations.
++func (c *Client) QueryLocation(ctx context.Context, l *ForemanLocation) (QueryResponse, error) {
++	log.Tracef("foreman/api/location.go#Search")
++
++	queryResponse := QueryResponse{}
++
++	reqEndpoint := fmt.Sprintf("/%s", LocationEndpointPrefix)
++	req, reqErr := c.NewRequestWithContext(
++		ctx,
++		http.MethodGet,
++		reqEndpoint,
++		nil,
++	)
++	if reqErr != nil {
++		return queryResponse, reqErr
++	}
++
++	reqQuery := req.URL.Query()
++	name := `"` + l.Name + `"`
++	reqQuery.Set("search", "name="+name)
++
++	req.URL.RawQuery = reqQuery.Encode()
++	sendErr := c.SendAndParse(req, &queryResponse)
++	if sendErr != nil {
++		return queryResponse, sendErr
++	}
++
++	log.Debugf("queryResponse: [%+v]", queryResponse)
++
++	results := []ForemanLocation{}
++	resultsBytes, jsonEncErr := json.Marshal(queryResponse.Results)
++	if jsonEncErr != nil {
++		return queryResponse, jsonEncErr
++	}
++	jsonDecErr := json.Unmarshal(resultsBytes, &results)
++	if jsonDecErr != nil {
++		return queryResponse, jsonDecErr
++	}
++	iArr := make([]interface{}, len(results))
++	for idx, val := range results {
++		iArr[idx] = val
++	}
++	queryResponse.Results = iArr
++
++	return queryResponse, nil
++}
+diff --git a/foreman/api/organization.go b/foreman/api/organization.go
+new file mode 100644
+index 0000000..819f52c
+--- /dev/null
++++ b/foreman/api/organization.go
+@@ -0,0 +1,213 @@
++package api
++
++import (
++	"bytes"
++	"context"
++	"encoding/json"
++	"fmt"
++	"net/http"
++
++	"github.com/HanseMerkur/terraform-provider-utils/log"
++)
++
++const (
++	OrganizationEndpointPrefix = "organizations"
++)
++
++// -----------------------------------------------------------------------------
++// Struct Definition and Helpers
++// -----------------------------------------------------------------------------
++
++// The ForemanOrganization API model represents a Foreman organization (taxonomy).
++type ForemanOrganization struct {
++	// Inherits the base object's attributes
++	ForemanObject
++
++	// Full ancestry path of the organization (computed by Foreman)
++	Title string `json:"title,omitempty"`
++	// Optional human-readable description
++	Description string `json:"description,omitempty"`
++	// ID of the parent organization, if nested
++	ParentID int `json:"parent_id,omitempty"`
++	// Name of the parent organization (read-only)
++	ParentName string `json:"parent_name,omitempty"`
++}
++
++// -----------------------------------------------------------------------------
++// CRUD Implementation
++// -----------------------------------------------------------------------------
++
++// CreateOrganization creates a new ForemanOrganization with the attributes of
++// the supplied ForemanOrganization reference and returns the created
++// ForemanOrganization reference. The returned reference will have its ID and
++// other API default values set by this function.
++func (c *Client) CreateOrganization(ctx context.Context, o *ForemanOrganization) (*ForemanOrganization, error) {
++	log.Tracef("foreman/api/organization.go#Create")
++
++	reqEndpoint := fmt.Sprintf("/%s", OrganizationEndpointPrefix)
++
++	organizationJSONBytes, jsonEncErr := c.WrapJSON("organization", o)
++	if jsonEncErr != nil {
++		return nil, jsonEncErr
++	}
++
++	log.Debugf("organizationJSONBytes: [%s]", organizationJSONBytes)
++
++	req, reqErr := c.NewRequestWithContext(
++		ctx,
++		http.MethodPost,
++		reqEndpoint,
++		bytes.NewBuffer(organizationJSONBytes),
++	)
++	if reqErr != nil {
++		return nil, reqErr
++	}
++
++	var createdOrganization ForemanOrganization
++	sendErr := c.SendAndParse(req, &createdOrganization)
++	if sendErr != nil {
++		return nil, sendErr
++	}
++
++	log.Debugf("createdOrganization: [%+v]", createdOrganization)
++
++	return &createdOrganization, nil
++}
++
++// ReadOrganization reads the attributes of a ForemanOrganization identified by
++// the supplied ID and returns a ForemanOrganization reference.
++func (c *Client) ReadOrganization(ctx context.Context, id int) (*ForemanOrganization, error) {
++	log.Tracef("foreman/api/organization.go#Read")
++
++	reqEndpoint := fmt.Sprintf("/%s/%d", OrganizationEndpointPrefix, id)
++
++	req, reqErr := c.NewRequestWithContext(
++		ctx,
++		http.MethodGet,
++		reqEndpoint,
++		nil,
++	)
++	if reqErr != nil {
++		return nil, reqErr
++	}
++
++	var readOrganization ForemanOrganization
++	sendErr := c.SendAndParse(req, &readOrganization)
++	if sendErr != nil {
++		return nil, sendErr
++	}
++
++	log.Debugf("readOrganization: [%+v]", readOrganization)
++
++	return &readOrganization, nil
++}
++
++// UpdateOrganization updates a ForemanOrganization's attributes. The
++// organization with the ID of the supplied ForemanOrganization will be
++// updated. A new ForemanOrganization reference is returned with the
++// attributes from the result of the update operation.
++func (c *Client) UpdateOrganization(ctx context.Context, o *ForemanOrganization) (*ForemanOrganization, error) {
++	log.Tracef("foreman/api/organization.go#Update")
++
++	reqEndpoint := fmt.Sprintf("/%s/%d", OrganizationEndpointPrefix, o.Id)
++
++	organizationJSONBytes, jsonEncErr := c.WrapJSON("organization", o)
++	if jsonEncErr != nil {
++		return nil, jsonEncErr
++	}
++
++	log.Debugf("organizationJSONBytes: [%s]", organizationJSONBytes)
++
++	req, reqErr := c.NewRequestWithContext(
++		ctx,
++		http.MethodPut,
++		reqEndpoint,
++		bytes.NewBuffer(organizationJSONBytes),
++	)
++	if reqErr != nil {
++		return nil, reqErr
++	}
++
++	var updatedOrganization ForemanOrganization
++	sendErr := c.SendAndParse(req, &updatedOrganization)
++	if sendErr != nil {
++		return nil, sendErr
++	}
++
++	log.Debugf("updatedOrganization: [%+v]", updatedOrganization)
++
++	return &updatedOrganization, nil
++}
++
++// DeleteOrganization deletes the ForemanOrganization identified by the
++// supplied ID
++func (c *Client) DeleteOrganization(ctx context.Context, id int) error {
++	log.Tracef("foreman/api/organization.go#Delete")
++
++	reqEndpoint := fmt.Sprintf("/%s/%d", OrganizationEndpointPrefix, id)
++
++	req, reqErr := c.NewRequestWithContext(
++		ctx,
++		http.MethodDelete,
++		reqEndpoint,
++		nil,
++	)
++	if reqErr != nil {
++		return reqErr
++	}
++
++	return c.SendAndParse(req, nil)
++}
++
++// -----------------------------------------------------------------------------
++// Query Implementation
++// -----------------------------------------------------------------------------
++
++// QueryOrganization queries for a ForemanOrganization based on the attributes
++// of the supplied ForemanOrganization reference and returns a QueryResponse
++// struct containing query/response metadata and the matching organizations.
++func (c *Client) QueryOrganization(ctx context.Context, o *ForemanOrganization) (QueryResponse, error) {
++	log.Tracef("foreman/api/organization.go#Search")
++
++	queryResponse := QueryResponse{}
++
++	reqEndpoint := fmt.Sprintf("/%s", OrganizationEndpointPrefix)
++	req, reqErr := c.NewRequestWithContext(
++		ctx,
++		http.MethodGet,
++		reqEndpoint,
++		nil,
++	)
++	if reqErr != nil {
++		return queryResponse, reqErr
++	}
++
++	reqQuery := req.URL.Query()
++	name := `"` + o.Name + `"`
++	reqQuery.Set("search", "name="+name)
++
++	req.URL.RawQuery = reqQuery.Encode()
++	sendErr := c.SendAndParse(req, &queryResponse)
++	if sendErr != nil {
++		return queryResponse, sendErr
++	}
++
++	log.Debugf("queryResponse: [%+v]", queryResponse)
++
++	results := []ForemanOrganization{}
++	resultsBytes, jsonEncErr := json.Marshal(queryResponse.Results)
++	if jsonEncErr != nil {
++		return queryResponse, jsonEncErr
++	}
++	jsonDecErr := json.Unmarshal(resultsBytes, &results)
++	if jsonDecErr != nil {
++		return queryResponse, jsonDecErr
++	}
++	iArr := make([]interface{}, len(results))
++	for idx, val := range results {
++		iArr[idx] = val
++	}
++	queryResponse.Results = iArr
++
++	return queryResponse, nil
++}
+diff --git a/foreman/data_source_foreman_location.go b/foreman/data_source_foreman_location.go
+new file mode 100644
+index 0000000..c64d0ca
+--- /dev/null
++++ b/foreman/data_source_foreman_location.go
+@@ -0,0 +1,76 @@
++package foreman
++
++import (
++	"context"
++	"fmt"
++
++	"github.com/HanseMerkur/terraform-provider-utils/autodoc"
++	"github.com/HanseMerkur/terraform-provider-utils/helper"
++	"github.com/HanseMerkur/terraform-provider-utils/log"
++	"github.com/masikrus/terraform-provider-foreman/foreman/api"
++
++	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
++	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
++)
++
++func dataSourceForemanLocation() *schema.Resource {
++	// copy attributes from resource definition
++	r := resourceForemanLocation()
++	ds := helper.DataSourceSchemaFromResourceSchema(r.Schema)
++
++	// define searchable attributes for the data source
++	ds["name"] = &schema.Schema{
++		Type:     schema.TypeString,
++		Required: true,
++		Description: fmt.Sprintf(
++			"The name of the location. "+
++				"%s \"ru_SBC\"",
++			autodoc.MetaExample,
++		),
++	}
++
++	return &schema.Resource{
++
++		ReadContext: dataSourceForemanLocationRead,
++
++		// NOTE(ALL): See comments in the corresponding resource file
++		Schema: ds,
++	}
++}
++
++func dataSourceForemanLocationRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
++	log.Tracef("data_source_foreman_location.go#Read")
++
++	client := meta.(*api.Client)
++	l := buildForemanLocation(d)
++
++	log.Debugf("ForemanLocation: [%+v]", l)
++
++	queryResponse, queryErr := client.QueryLocation(ctx, l)
++	if queryErr != nil {
++		return diag.FromErr(queryErr)
++	}
++
++	if queryResponse.Subtotal == 0 {
++		return diag.Errorf("Data source location returned no results")
++	} else if queryResponse.Subtotal > 1 {
++		return diag.Errorf("Data source location returned more than 1 result")
++	}
++
++	var queryLocation api.ForemanLocation
++	var ok bool
++	if queryLocation, ok = queryResponse.Results[0].(api.ForemanLocation); !ok {
++		return diag.Errorf(
++			"Data source results contain unexpected type. Expected "+
++				"[api.ForemanLocation], got [%T]",
++			queryResponse.Results[0],
++		)
++	}
++	l = &queryLocation
++
++	log.Debugf("ForemanLocation: [%+v]", l)
++
++	setResourceDataFromForemanLocation(d, l)
++
++	return nil
++}
+diff --git a/foreman/data_source_foreman_location_test.go b/foreman/data_source_foreman_location_test.go
+new file mode 100644
+index 0000000..703fb23
+--- /dev/null
++++ b/foreman/data_source_foreman_location_test.go
+@@ -0,0 +1,106 @@
++package foreman
++
++import (
++	"net/http"
++	"testing"
++)
++
++func DataSourceForemanLocationCorrectURLAndMethodTestCases(t *testing.T) []TestCaseCorrectURLAndMethod {
++	obj := RandForemanLocation()
++	s := ForemanLocationToInstanceState(obj)
++
++	return []TestCaseCorrectURLAndMethod{
++		{
++			TestCase: TestCase{
++				funcName:     "dataSourceForemanLocationRead",
++				crudFunc:     dataSourceForemanLocationRead,
++				resourceData: MockForemanLocationResourceData(s),
++			},
++			expectedURIs: []ExpectedUri{
++				{
++					expectedURI:    LocationsURI,
++					expectedMethod: http.MethodGet,
++				},
++			},
++		},
++	}
++}
++
++func DataSourceForemanLocationRequestDataEmptyTestCases(t *testing.T) []TestCase {
++	obj := RandForemanLocation()
++	s := ForemanLocationToInstanceState(obj)
++
++	return []TestCase{
++		{
++			funcName:     "dataSourceForemanLocationRead",
++			crudFunc:     dataSourceForemanLocationRead,
++			resourceData: MockForemanLocationResourceData(s),
++		},
++	}
++}
++
++func DataSourceForemanLocationStatusCodeTestCases(t *testing.T) []TestCase {
++	obj := RandForemanLocation()
++	s := ForemanLocationToInstanceState(obj)
++
++	return []TestCase{
++		{
++			funcName:     "dataSourceForemanLocationRead",
++			crudFunc:     dataSourceForemanLocationRead,
++			resourceData: MockForemanLocationResourceData(s),
++		},
++	}
++}
++
++func DataSourceForemanLocationEmptyResponseTestCases(t *testing.T) []TestCase {
++	obj := RandForemanLocation()
++	s := ForemanLocationToInstanceState(obj)
++
++	return []TestCase{
++		{
++			funcName:     "dataSourceForemanLocationRead",
++			crudFunc:     dataSourceForemanLocationRead,
++			resourceData: MockForemanLocationResourceData(s),
++		},
++	}
++}
++
++func DataSourceForemanLocationMockResponseTestCases(t *testing.T) []TestCaseMockResponse {
++	obj := RandForemanLocation()
++	s := ForemanLocationToInstanceState(obj)
++
++	return []TestCaseMockResponse{
++		{
++			TestCase: TestCase{
++				funcName:     "dataSourceForemanLocationRead",
++				crudFunc:     dataSourceForemanLocationRead,
++				resourceData: MockForemanLocationResourceData(s),
++			},
++			responseFile: LocationsTestDataPath + "/query_response_multi.json",
++			returnError:  true,
++		},
++		{
++			TestCase: TestCase{
++				funcName:     "dataSourceForemanLocationRead",
++				crudFunc:     dataSourceForemanLocationRead,
++				resourceData: MockForemanLocationResourceData(s),
++			},
++			responseFile: TestDataPath + "/query_response_zero.json",
++			returnError:  true,
++		},
++		{
++			TestCase: TestCase{
++				funcName:     "dataSourceForemanLocationRead",
++				crudFunc:     dataSourceForemanLocationRead,
++				resourceData: MockForemanLocationResourceData(s),
++			},
++			responseFile: LocationsTestDataPath + "/query_response_single.json",
++			returnError:  false,
++			expectedResourceData: MockForemanLocationResourceDataFromFile(
++				t,
++				LocationsTestDataPath+"/query_response_single_state.json",
++			),
++			compareFunc: ForemanLocationResourceDataCompare,
++		},
++	}
++}
+diff --git a/foreman/data_source_foreman_organization.go b/foreman/data_source_foreman_organization.go
+new file mode 100644
+index 0000000..5f8b8b1
+--- /dev/null
++++ b/foreman/data_source_foreman_organization.go
+@@ -0,0 +1,76 @@
++package foreman
++
++import (
++	"context"
++	"fmt"
++
++	"github.com/HanseMerkur/terraform-provider-utils/autodoc"
++	"github.com/HanseMerkur/terraform-provider-utils/helper"
++	"github.com/HanseMerkur/terraform-provider-utils/log"
++	"github.com/masikrus/terraform-provider-foreman/foreman/api"
++
++	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
++	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
++)
++
++func dataSourceForemanOrganization() *schema.Resource {
++	// copy attributes from resource definition
++	r := resourceForemanOrganization()
++	ds := helper.DataSourceSchemaFromResourceSchema(r.Schema)
++
++	// define searchable attributes for the data source
++	ds["name"] = &schema.Schema{
++		Type:     schema.TypeString,
++		Required: true,
++		Description: fmt.Sprintf(
++			"The name of the organization. "+
++				"%s \"Okko\"",
++			autodoc.MetaExample,
++		),
++	}
++
++	return &schema.Resource{
++
++		ReadContext: dataSourceForemanOrganizationRead,
++
++		// NOTE(ALL): See comments in the corresponding resource file
++		Schema: ds,
++	}
++}
++
++func dataSourceForemanOrganizationRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
++	log.Tracef("data_source_foreman_organization.go#Read")
++
++	client := meta.(*api.Client)
++	o := buildForemanOrganization(d)
++
++	log.Debugf("ForemanOrganization: [%+v]", o)
++
++	queryResponse, queryErr := client.QueryOrganization(ctx, o)
++	if queryErr != nil {
++		return diag.FromErr(queryErr)
++	}
++
++	if queryResponse.Subtotal == 0 {
++		return diag.Errorf("Data source organization returned no results")
++	} else if queryResponse.Subtotal > 1 {
++		return diag.Errorf("Data source organization returned more than 1 result")
++	}
++
++	var queryOrganization api.ForemanOrganization
++	var ok bool
++	if queryOrganization, ok = queryResponse.Results[0].(api.ForemanOrganization); !ok {
++		return diag.Errorf(
++			"Data source results contain unexpected type. Expected "+
++				"[api.ForemanOrganization], got [%T]",
++			queryResponse.Results[0],
++		)
++	}
++	o = &queryOrganization
++
++	log.Debugf("ForemanOrganization: [%+v]", o)
++
++	setResourceDataFromForemanOrganization(d, o)
++
++	return nil
++}
+diff --git a/foreman/data_source_foreman_organization_test.go b/foreman/data_source_foreman_organization_test.go
+new file mode 100644
+index 0000000..39e25d8
+--- /dev/null
++++ b/foreman/data_source_foreman_organization_test.go
+@@ -0,0 +1,106 @@
++package foreman
++
++import (
++	"net/http"
++	"testing"
++)
++
++func DataSourceForemanOrganizationCorrectURLAndMethodTestCases(t *testing.T) []TestCaseCorrectURLAndMethod {
++	obj := RandForemanOrganization()
++	s := ForemanOrganizationToInstanceState(obj)
++
++	return []TestCaseCorrectURLAndMethod{
++		{
++			TestCase: TestCase{
++				funcName:     "dataSourceForemanOrganizationRead",
++				crudFunc:     dataSourceForemanOrganizationRead,
++				resourceData: MockForemanOrganizationResourceData(s),
++			},
++			expectedURIs: []ExpectedUri{
++				{
++					expectedURI:    OrganizationsURI,
++					expectedMethod: http.MethodGet,
++				},
++			},
++		},
++	}
++}
++
++func DataSourceForemanOrganizationRequestDataEmptyTestCases(t *testing.T) []TestCase {
++	obj := RandForemanOrganization()
++	s := ForemanOrganizationToInstanceState(obj)
++
++	return []TestCase{
++		{
++			funcName:     "dataSourceForemanOrganizationRead",
++			crudFunc:     dataSourceForemanOrganizationRead,
++			resourceData: MockForemanOrganizationResourceData(s),
++		},
++	}
++}
++
++func DataSourceForemanOrganizationStatusCodeTestCases(t *testing.T) []TestCase {
++	obj := RandForemanOrganization()
++	s := ForemanOrganizationToInstanceState(obj)
++
++	return []TestCase{
++		{
++			funcName:     "dataSourceForemanOrganizationRead",
++			crudFunc:     dataSourceForemanOrganizationRead,
++			resourceData: MockForemanOrganizationResourceData(s),
++		},
++	}
++}
++
++func DataSourceForemanOrganizationEmptyResponseTestCases(t *testing.T) []TestCase {
++	obj := RandForemanOrganization()
++	s := ForemanOrganizationToInstanceState(obj)
++
++	return []TestCase{
++		{
++			funcName:     "dataSourceForemanOrganizationRead",
++			crudFunc:     dataSourceForemanOrganizationRead,
++			resourceData: MockForemanOrganizationResourceData(s),
++		},
++	}
++}
++
++func DataSourceForemanOrganizationMockResponseTestCases(t *testing.T) []TestCaseMockResponse {
++	obj := RandForemanOrganization()
++	s := ForemanOrganizationToInstanceState(obj)
++
++	return []TestCaseMockResponse{
++		{
++			TestCase: TestCase{
++				funcName:     "dataSourceForemanOrganizationRead",
++				crudFunc:     dataSourceForemanOrganizationRead,
++				resourceData: MockForemanOrganizationResourceData(s),
++			},
++			responseFile: OrganizationsTestDataPath + "/query_response_multi.json",
++			returnError:  true,
++		},
++		{
++			TestCase: TestCase{
++				funcName:     "dataSourceForemanOrganizationRead",
++				crudFunc:     dataSourceForemanOrganizationRead,
++				resourceData: MockForemanOrganizationResourceData(s),
++			},
++			responseFile: TestDataPath + "/query_response_zero.json",
++			returnError:  true,
++		},
++		{
++			TestCase: TestCase{
++				funcName:     "dataSourceForemanOrganizationRead",
++				crudFunc:     dataSourceForemanOrganizationRead,
++				resourceData: MockForemanOrganizationResourceData(s),
++			},
++			responseFile: OrganizationsTestDataPath + "/query_response_single.json",
++			returnError:  false,
++			expectedResourceData: MockForemanOrganizationResourceDataFromFile(
++				t,
++				OrganizationsTestDataPath+"/query_response_single_state.json",
++			),
++			compareFunc: ForemanOrganizationResourceDataCompare,
++		},
++	}
++}
+diff --git a/foreman/foreman_api_test.go b/foreman/foreman_api_test.go
+index cb11732..1fecf79 100644
+--- a/foreman/foreman_api_test.go
++++ b/foreman/foreman_api_test.go
+@@ -214,6 +214,12 @@ func TestCRUDFunction_CorrectURLAndMethod(t *testing.T) {
+ 	testCases = append(testCases, ResourceForemanEnvironmentCorrectURLAndMethodTestCases(t)...)
+ 	testCases = append(testCases, DataSourceForemanEnvironmentCorrectURLAndMethodTestCases(t)...)
+ 
++	testCases = append(testCases, ResourceForemanLocationCorrectURLAndMethodTestCases(t)...)
++	testCases = append(testCases, DataSourceForemanLocationCorrectURLAndMethodTestCases(t)...)
++
++	testCases = append(testCases, ResourceForemanOrganizationCorrectURLAndMethodTestCases(t)...)
++	testCases = append(testCases, DataSourceForemanOrganizationCorrectURLAndMethodTestCases(t)...)
++
+ 	testCases = append(testCases, ResourceForemanHostCorrectURLAndMethodTestCases(t)...)
+ 
+ 	testCases = append(testCases, ResourceForemanHostgroupCorrectURLAndMethodTestCases(t)...)
+@@ -316,6 +322,12 @@ func TestCRUDFunction_RequestDataEmpty(t *testing.T) {
+ 	testCases = append(testCases, ResourceForemanEnvironmentRequestDataEmptyTestCases(t)...)
+ 	testCases = append(testCases, DataSourceForemanEnvironmentRequestDataEmptyTestCases(t)...)
+ 
++	testCases = append(testCases, ResourceForemanLocationRequestDataEmptyTestCases(t)...)
++	testCases = append(testCases, DataSourceForemanLocationRequestDataEmptyTestCases(t)...)
++
++	testCases = append(testCases, ResourceForemanOrganizationRequestDataEmptyTestCases(t)...)
++	testCases = append(testCases, DataSourceForemanOrganizationRequestDataEmptyTestCases(t)...)
++
+ 	testCases = append(testCases, ResourceForemanHostRequestDataEmptyTestCases(t)...)
+ 
+ 	testCases = append(testCases, ResourceForemanHostgroupRequestDataEmptyTestCases(t)...)
+@@ -461,6 +473,12 @@ func TestCRUDFunction_StatusCodeError(t *testing.T) {
+ 	testCases = append(testCases, ResourceForemanEnvironmentStatusCodeTestCases(t)...)
+ 	testCases = append(testCases, DataSourceForemanEnvironmentStatusCodeTestCases(t)...)
+ 
++	testCases = append(testCases, ResourceForemanLocationStatusCodeTestCases(t)...)
++	testCases = append(testCases, DataSourceForemanLocationStatusCodeTestCases(t)...)
++
++	testCases = append(testCases, ResourceForemanOrganizationStatusCodeTestCases(t)...)
++	testCases = append(testCases, DataSourceForemanOrganizationStatusCodeTestCases(t)...)
++
+ 	testCases = append(testCases, ResourceForemanHostStatusCodeTestCases(t)...)
+ 
+ 	testCases = append(testCases, ResourceForemanHostgroupStatusCodeTestCases(t)...)
+@@ -545,6 +563,12 @@ func TestCRUDFunction_EmptyResponseError(t *testing.T) {
+ 	testCases = append(testCases, ResourceForemanEnvironmentEmptyResponseTestCases(t)...)
+ 	testCases = append(testCases, DataSourceForemanEnvironmentEmptyResponseTestCases(t)...)
+ 
++	testCases = append(testCases, ResourceForemanLocationEmptyResponseTestCases(t)...)
++	testCases = append(testCases, DataSourceForemanLocationEmptyResponseTestCases(t)...)
++
++	testCases = append(testCases, ResourceForemanOrganizationEmptyResponseTestCases(t)...)
++	testCases = append(testCases, DataSourceForemanOrganizationEmptyResponseTestCases(t)...)
++
+ 	testCases = append(testCases, ResourceForemanHostEmptyResponseTestCases(t)...)
+ 
+ 	testCases = append(testCases, ResourceForemanHostgroupEmptyResponseTestCases(t)...)
+@@ -667,6 +691,12 @@ func TestCRUDFunction_MockResponse(t *testing.T) {
+ 	testCases = append(testCases, ResourceForemanEnvironmentMockResponseTestCases(t)...)
+ 	testCases = append(testCases, DataSourceForemanEnvironmentMockResponseTestCases(t)...)
+ 
++	testCases = append(testCases, ResourceForemanLocationMockResponseTestCases(t)...)
++	testCases = append(testCases, DataSourceForemanLocationMockResponseTestCases(t)...)
++
++	testCases = append(testCases, ResourceForemanOrganizationMockResponseTestCases(t)...)
++	testCases = append(testCases, DataSourceForemanOrganizationMockResponseTestCases(t)...)
++
+ 	testCases = append(testCases, ResourceForemanHostMockResponseTestCases(t)...)
+ 
+ 	testCases = append(testCases, ResourceForemanHostgroupMockResponseTestCases(t)...)
+diff --git a/foreman/provider.go b/foreman/provider.go
+index 0008394..680d26b 100644
+--- a/foreman/provider.go
++++ b/foreman/provider.go
+@@ -188,6 +188,8 @@ func Provider() *schema.Provider {
+ 			"foreman_computeresource":               resourceForemanComputeResource(),
+ 			"foreman_image":                         resourceForemanImage(),
+ 			"foreman_environment":                   resourceForemanEnvironment(),
++			"foreman_location":                      resourceForemanLocation(),
++			"foreman_organization":                  resourceForemanOrganization(),
+ 			"foreman_parameter":                     resourceForemanParameter(),
+ 			"foreman_global_parameter":              resourceForemanCommonParameter(),
+ 			"foreman_subnet":                        resourceForemanSubnet(),
+@@ -212,6 +214,8 @@ func Provider() *schema.Provider {
+ 			"foreman_architecture":                  dataSourceForemanArchitecture(),
+ 			"foreman_domain":                        dataSourceForemanDomain(),
+ 			"foreman_environment":                   dataSourceForemanEnvironment(),
++			"foreman_location":                      dataSourceForemanLocation(),
++			"foreman_organization":                  dataSourceForemanOrganization(),
+ 			"foreman_hostgroup":                     dataSourceForemanHostgroup(),
+ 			"foreman_media":                         dataSourceForemanMedia(),
+ 			"foreman_model":                         dataSourceForemanModel(),
+diff --git a/foreman/resource_foreman_location.go b/foreman/resource_foreman_location.go
+new file mode 100644
+index 0000000..021b8c6
+--- /dev/null
++++ b/foreman/resource_foreman_location.go
+@@ -0,0 +1,195 @@
++package foreman
++
++import (
++	"context"
++	"fmt"
++	"strconv"
++
++	"github.com/HanseMerkur/terraform-provider-utils/autodoc"
++	"github.com/HanseMerkur/terraform-provider-utils/log"
++	"github.com/masikrus/terraform-provider-foreman/foreman/api"
++
++	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
++	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
++	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
++)
++
++func resourceForemanLocation() *schema.Resource {
++	return &schema.Resource{
++
++		CreateContext: resourceForemanLocationCreate,
++		ReadContext:   resourceForemanLocationRead,
++		UpdateContext: resourceForemanLocationUpdate,
++		DeleteContext: resourceForemanLocationDelete,
++
++		Importer: &schema.ResourceImporter{
++			StateContext: schema.ImportStatePassthroughContext,
++		},
++
++		Schema: map[string]*schema.Schema{
++
++			autodoc.MetaAttribute: {
++				Type:     schema.TypeBool,
++				Computed: true,
++				Description: fmt.Sprintf(
++					"%s A Foreman location (taxonomy).",
++					autodoc.MetaSummary,
++				),
++			},
++
++			"name": {
++				Type:     schema.TypeString,
++				Required: true,
++				Description: fmt.Sprintf(
++					"Name of the location. "+
++						"%s \"ru_SBC\"",
++					autodoc.MetaExample,
++				),
++			},
++
++			"title": {
++				Type:     schema.TypeString,
++				Computed: true,
++				Description: "The title is the fullname of the location. A " +
++					"location's title is a path-like string from the head " +
++					"of the location tree down to this location.",
++			},
++
++			"description": {
++				Type:        schema.TypeString,
++				Optional:    true,
++				Description: "Optional description of the location.",
++			},
++
++			"parent_id": {
++				Type:         schema.TypeInt,
++				Optional:     true,
++				ValidateFunc: validation.IntAtLeast(0),
++				Description:  "ID of the parent location.",
++			},
++		},
++	}
++}
++
++// -----------------------------------------------------------------------------
++// Conversion Helpers
++// -----------------------------------------------------------------------------
++
++// buildForemanLocation constructs a ForemanLocation reference from a
++// resource data reference. The struct's members are populated from the data
++// populated in the resource data. Missing members will be left to the zero
++// value for that member's type.
++func buildForemanLocation(d *schema.ResourceData) *api.ForemanLocation {
++	log.Tracef("resource_foreman_location.go#buildForemanLocation")
++
++	location := api.ForemanLocation{}
++
++	obj := buildForemanObject(d)
++	location.ForemanObject = *obj
++
++	var attr interface{}
++	var ok bool
++
++	if attr, ok = d.GetOk("name"); ok {
++		location.Name = attr.(string)
++	}
++	if attr, ok = d.GetOk("title"); ok {
++		location.Title = attr.(string)
++	}
++	if attr, ok = d.GetOk("description"); ok {
++		location.Description = attr.(string)
++	}
++	if attr, ok = d.GetOk("parent_id"); ok {
++		location.ParentID = attr.(int)
++	}
++
++	return &location
++}
++
++// setResourceDataFromForemanLocation sets a ResourceData's attributes from
++// the attributes of the supplied ForemanLocation reference
++func setResourceDataFromForemanLocation(d *schema.ResourceData, fl *api.ForemanLocation) {
++	log.Tracef("resource_foreman_location.go#setResourceDataFromForemanLocation")
++
++	d.SetId(strconv.Itoa(fl.Id))
++	d.Set("name", fl.Name)
++	d.Set("title", fl.Title)
++	d.Set("description", fl.Description)
++	d.Set("parent_id", fl.ParentID)
++}
++
++// -----------------------------------------------------------------------------
++// Resource CRUD Operations
++// -----------------------------------------------------------------------------
++
++func resourceForemanLocationCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
++	log.Tracef("resource_foreman_location.go#Create")
++
++	client := meta.(*api.Client)
++	l := buildForemanLocation(d)
++
++	log.Debugf("ForemanLocation: [%+v]", l)
++
++	createdLoc, createErr := client.CreateLocation(ctx, l)
++	if createErr != nil {
++		return diag.FromErr(createErr)
++	}
++
++	log.Debugf("Created ForemanLocation: [%+v]", createdLoc)
++
++	setResourceDataFromForemanLocation(d, createdLoc)
++
++	return nil
++}
++
++func resourceForemanLocationRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
++	log.Tracef("resource_foreman_location.go#Read")
++
++	client := meta.(*api.Client)
++	l := buildForemanLocation(d)
++
++	log.Debugf("ForemanLocation: [%+v]", l)
++
++	readLocation, readErr := client.ReadLocation(ctx, l.Id)
++	if readErr != nil {
++		return diag.FromErr(api.CheckDeleted(d, readErr))
++	}
++
++	log.Debugf("Read ForemanLocation: [%+v]", readLocation)
++
++	setResourceDataFromForemanLocation(d, readLocation)
++
++	return nil
++}
++
++func resourceForemanLocationUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
++	log.Tracef("resource_foreman_location.go#Update")
++
++	client := meta.(*api.Client)
++	l := buildForemanLocation(d)
++
++	log.Debugf("ForemanLocation: [%+v]", l)
++
++	updatedLoc, updateErr := client.UpdateLocation(ctx, l)
++	if updateErr != nil {
++		return diag.FromErr(updateErr)
++	}
++
++	log.Debugf("Updated ForemanLocation: [%+v]", updatedLoc)
++
++	setResourceDataFromForemanLocation(d, updatedLoc)
++
++	return nil
++}
++
++func resourceForemanLocationDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
++	log.Tracef("resource_foreman_location.go#Delete")
++
++	client := meta.(*api.Client)
++	l := buildForemanLocation(d)
++
++	// NOTE(ALL): d.SetId("") is automatically called by terraform assuming delete
++	//   returns no errors
++
++	return diag.FromErr(api.CheckDeleted(d, client.DeleteLocation(ctx, l.Id)))
++}
+diff --git a/foreman/resource_foreman_location_test.go b/foreman/resource_foreman_location_test.go
+new file mode 100644
+index 0000000..d7d42ae
+--- /dev/null
++++ b/foreman/resource_foreman_location_test.go
+@@ -0,0 +1,215 @@
++package foreman
++
++import (
++	"encoding/json"
++	"math/rand"
++	"net/http"
++	"reflect"
++	"strconv"
++	"testing"
++
++	tfrand "github.com/HanseMerkur/terraform-provider-utils/rand"
++	"github.com/masikrus/terraform-provider-foreman/foreman/api"
++
++	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
++	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
++)
++
++// -----------------------------------------------------------------------------
++// Test Helper Functions
++// -----------------------------------------------------------------------------
++
++const LocationsURI = api.FOREMAN_API_URL_PREFIX + "/locations"
++const LocationsTestDataPath = "testdata/1.11/locations"
++
++// Given a ForemanLocation, create a mock instance state reference
++func ForemanLocationToInstanceState(obj api.ForemanLocation) *terraform.InstanceState {
++	state := terraform.InstanceState{}
++	state.ID = strconv.Itoa(obj.Id)
++	attr := map[string]string{}
++	attr["name"] = obj.Name
++	attr["title"] = obj.Title
++	attr["description"] = obj.Description
++	attr["parent_id"] = strconv.Itoa(obj.ParentID)
++	state.Attributes = attr
++	return &state
++}
++
++func MockForemanLocationResourceData(s *terraform.InstanceState) *schema.ResourceData {
++	r := resourceForemanLocation()
++	return r.Data(s)
++}
++
++func MockForemanLocationResourceDataFromFile(t *testing.T, path string) *schema.ResourceData {
++	var obj api.ForemanLocation
++	ParseJSONFile(t, path, &obj)
++	s := ForemanLocationToInstanceState(obj)
++	return MockForemanLocationResourceData(s)
++}
++
++func RandForemanLocation() api.ForemanLocation {
++	obj := api.ForemanLocation{}
++
++	fo := RandForemanObject()
++	obj.ForemanObject = fo
++	obj.Title = fo.Name
++	obj.Description = tfrand.String(20, tfrand.Lower)
++	obj.ParentID = rand.Intn(100)
++
++	return obj
++}
++
++func ForemanLocationResourceDataCompare(t *testing.T, r1 *schema.ResourceData, r2 *schema.ResourceData) {
++	if r1.Id() != r2.Id() {
++		t.Fatalf(
++			"ResourceData references differ in Id. [%s], [%s]",
++			r1.Id(),
++			r2.Id(),
++		)
++	}
++
++	m := map[string]schema.ValueType{}
++	r := resourceForemanLocation()
++	for key, value := range r.Schema {
++		m[key] = value.Type
++	}
++
++	CompareResourceDataAttributes(t, m, r1, r2)
++}
++
++// -----------------------------------------------------------------------------
++// UnmarshalJSON
++// -----------------------------------------------------------------------------
++
++func TestLocationUnmarshalJSON_ForemanObject(t *testing.T) {
++	randObj := RandForemanObject()
++	randObjBytes, _ := json.Marshal(randObj)
++
++	var obj api.ForemanLocation
++	jsonDecErr := json.Unmarshal(randObjBytes, &obj)
++	if jsonDecErr != nil {
++		t.Errorf(
++			"ForemanLocation UnmarshalJSON could not decode base ForemanObject. "+
++				"Expected [nil] got [error]. Error value: [%s]",
++			jsonDecErr,
++		)
++	}
++
++	if !reflect.DeepEqual(obj.ForemanObject, randObj) {
++		t.Errorf(
++			"ForemanLocation UnmarshalJSON did not properly decode base "+
++				"ForemanObject properties. Expected [%+v], got [%+v]",
++			randObj,
++			obj.ForemanObject,
++		)
++	}
++}
++
++// -----------------------------------------------------------------------------
++// setResourceDataFromForemanLocation
++// -----------------------------------------------------------------------------
++
++func TestSetResourceDataFromForemanLocation_Value(t *testing.T) {
++	expectedObj := RandForemanLocation()
++	expectedState := ForemanLocationToInstanceState(expectedObj)
++	expectedResourceData := MockForemanLocationResourceData(expectedState)
++
++	actualObj := api.ForemanLocation{}
++	actualState := ForemanLocationToInstanceState(actualObj)
++	actualResourceData := MockForemanLocationResourceData(actualState)
++
++	setResourceDataFromForemanLocation(actualResourceData, &expectedObj)
++
++	ForemanLocationResourceDataCompare(t, actualResourceData, expectedResourceData)
++}
++
++// ----------------------------------------------------------------------------
++// Test Cases for the Unit Test Framework
++// ----------------------------------------------------------------------------
++
++func ResourceForemanLocationCorrectURLAndMethodTestCases(t *testing.T) []TestCaseCorrectURLAndMethod {
++	obj := api.ForemanLocation{}
++	obj.Id = rand.Intn(100)
++	s := ForemanLocationToInstanceState(obj)
++	locationsURIById := LocationsURI + "/" + strconv.Itoa(obj.Id)
++
++	return []TestCaseCorrectURLAndMethod{
++		{
++			TestCase: TestCase{
++				funcName:     "resourceForemanLocationRead",
++				crudFunc:     resourceForemanLocationRead,
++				resourceData: MockForemanLocationResourceData(s),
++			},
++			expectedURIs: []ExpectedUri{
++				{
++					expectedURI:    locationsURIById,
++					expectedMethod: http.MethodGet,
++				},
++			},
++		},
++	}
++}
++
++func ResourceForemanLocationRequestDataEmptyTestCases(t *testing.T) []TestCase {
++	obj := api.ForemanLocation{}
++	obj.Id = rand.Intn(100)
++	s := ForemanLocationToInstanceState(obj)
++
++	return []TestCase{
++		{
++			funcName:     "resourceForemanLocationRead",
++			crudFunc:     resourceForemanLocationRead,
++			resourceData: MockForemanLocationResourceData(s),
++		},
++	}
++}
++
++func ResourceForemanLocationStatusCodeTestCases(t *testing.T) []TestCase {
++	obj := api.ForemanLocation{}
++	obj.Id = rand.Intn(100)
++	s := ForemanLocationToInstanceState(obj)
++
++	return []TestCase{
++		{
++			funcName:     "resourceForemanLocationRead",
++			crudFunc:     resourceForemanLocationRead,
++			resourceData: MockForemanLocationResourceData(s),
++		},
++	}
++}
++
++func ResourceForemanLocationEmptyResponseTestCases(t *testing.T) []TestCase {
++	obj := api.ForemanLocation{}
++	obj.Id = rand.Intn(100)
++	s := ForemanLocationToInstanceState(obj)
++
++	return []TestCase{
++		{
++			funcName:     "resourceForemanLocationRead",
++			crudFunc:     resourceForemanLocationRead,
++			resourceData: MockForemanLocationResourceData(s),
++		},
++	}
++}
++
++func ResourceForemanLocationMockResponseTestCases(t *testing.T) []TestCaseMockResponse {
++	obj := RandForemanLocation()
++	s := ForemanLocationToInstanceState(obj)
++
++	return []TestCaseMockResponse{
++		{
++			TestCase: TestCase{
++				funcName:     "resourceForemanLocationRead",
++				crudFunc:     resourceForemanLocationRead,
++				resourceData: MockForemanLocationResourceData(s),
++			},
++			responseFile: LocationsTestDataPath + "/read_response.json",
++			returnError:  false,
++			expectedResourceData: MockForemanLocationResourceDataFromFile(
++				t,
++				LocationsTestDataPath+"/read_response.json",
++			),
++			compareFunc: ForemanLocationResourceDataCompare,
++		},
++	}
++}
+diff --git a/foreman/resource_foreman_organization.go b/foreman/resource_foreman_organization.go
+new file mode 100644
+index 0000000..2dbd1c2
+--- /dev/null
++++ b/foreman/resource_foreman_organization.go
+@@ -0,0 +1,195 @@
++package foreman
++
++import (
++	"context"
++	"fmt"
++	"strconv"
++
++	"github.com/HanseMerkur/terraform-provider-utils/autodoc"
++	"github.com/HanseMerkur/terraform-provider-utils/log"
++	"github.com/masikrus/terraform-provider-foreman/foreman/api"
++
++	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
++	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
++	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
++)
++
++func resourceForemanOrganization() *schema.Resource {
++	return &schema.Resource{
++
++		CreateContext: resourceForemanOrganizationCreate,
++		ReadContext:   resourceForemanOrganizationRead,
++		UpdateContext: resourceForemanOrganizationUpdate,
++		DeleteContext: resourceForemanOrganizationDelete,
++
++		Importer: &schema.ResourceImporter{
++			StateContext: schema.ImportStatePassthroughContext,
++		},
++
++		Schema: map[string]*schema.Schema{
++
++			autodoc.MetaAttribute: {
++				Type:     schema.TypeBool,
++				Computed: true,
++				Description: fmt.Sprintf(
++					"%s A Foreman organization (taxonomy).",
++					autodoc.MetaSummary,
++				),
++			},
++
++			"name": {
++				Type:     schema.TypeString,
++				Required: true,
++				Description: fmt.Sprintf(
++					"Name of the organization. "+
++						"%s \"Okko\"",
++					autodoc.MetaExample,
++				),
++			},
++
++			"title": {
++				Type:     schema.TypeString,
++				Computed: true,
++				Description: "The title is the fullname of the organization. An " +
++					"organization's title is a path-like string from the head " +
++					"of the organization tree down to this organization.",
++			},
++
++			"description": {
++				Type:        schema.TypeString,
++				Optional:    true,
++				Description: "Optional description of the organization.",
++			},
++
++			"parent_id": {
++				Type:         schema.TypeInt,
++				Optional:     true,
++				ValidateFunc: validation.IntAtLeast(0),
++				Description:  "ID of the parent organization.",
++			},
++		},
++	}
++}
++
++// -----------------------------------------------------------------------------
++// Conversion Helpers
++// -----------------------------------------------------------------------------
++
++// buildForemanOrganization constructs a ForemanOrganization reference from a
++// resource data reference. The struct's members are populated from the data
++// populated in the resource data. Missing members will be left to the zero
++// value for that member's type.
++func buildForemanOrganization(d *schema.ResourceData) *api.ForemanOrganization {
++	log.Tracef("resource_foreman_organization.go#buildForemanOrganization")
++
++	organization := api.ForemanOrganization{}
++
++	obj := buildForemanObject(d)
++	organization.ForemanObject = *obj
++
++	var attr interface{}
++	var ok bool
++
++	if attr, ok = d.GetOk("name"); ok {
++		organization.Name = attr.(string)
++	}
++	if attr, ok = d.GetOk("title"); ok {
++		organization.Title = attr.(string)
++	}
++	if attr, ok = d.GetOk("description"); ok {
++		organization.Description = attr.(string)
++	}
++	if attr, ok = d.GetOk("parent_id"); ok {
++		organization.ParentID = attr.(int)
++	}
++
++	return &organization
++}
++
++// setResourceDataFromForemanOrganization sets a ResourceData's attributes from
++// the attributes of the supplied ForemanOrganization reference
++func setResourceDataFromForemanOrganization(d *schema.ResourceData, fo *api.ForemanOrganization) {
++	log.Tracef("resource_foreman_organization.go#setResourceDataFromForemanOrganization")
++
++	d.SetId(strconv.Itoa(fo.Id))
++	d.Set("name", fo.Name)
++	d.Set("title", fo.Title)
++	d.Set("description", fo.Description)
++	d.Set("parent_id", fo.ParentID)
++}
++
++// -----------------------------------------------------------------------------
++// Resource CRUD Operations
++// -----------------------------------------------------------------------------
++
++func resourceForemanOrganizationCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
++	log.Tracef("resource_foreman_organization.go#Create")
++
++	client := meta.(*api.Client)
++	o := buildForemanOrganization(d)
++
++	log.Debugf("ForemanOrganization: [%+v]", o)
++
++	createdOrg, createErr := client.CreateOrganization(ctx, o)
++	if createErr != nil {
++		return diag.FromErr(createErr)
++	}
++
++	log.Debugf("Created ForemanOrganization: [%+v]", createdOrg)
++
++	setResourceDataFromForemanOrganization(d, createdOrg)
++
++	return nil
++}
++
++func resourceForemanOrganizationRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
++	log.Tracef("resource_foreman_organization.go#Read")
++
++	client := meta.(*api.Client)
++	o := buildForemanOrganization(d)
++
++	log.Debugf("ForemanOrganization: [%+v]", o)
++
++	readOrganization, readErr := client.ReadOrganization(ctx, o.Id)
++	if readErr != nil {
++		return diag.FromErr(api.CheckDeleted(d, readErr))
++	}
++
++	log.Debugf("Read ForemanOrganization: [%+v]", readOrganization)
++
++	setResourceDataFromForemanOrganization(d, readOrganization)
++
++	return nil
++}
++
++func resourceForemanOrganizationUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
++	log.Tracef("resource_foreman_organization.go#Update")
++
++	client := meta.(*api.Client)
++	o := buildForemanOrganization(d)
++
++	log.Debugf("ForemanOrganization: [%+v]", o)
++
++	updatedOrg, updateErr := client.UpdateOrganization(ctx, o)
++	if updateErr != nil {
++		return diag.FromErr(updateErr)
++	}
++
++	log.Debugf("Updated ForemanOrganization: [%+v]", updatedOrg)
++
++	setResourceDataFromForemanOrganization(d, updatedOrg)
++
++	return nil
++}
++
++func resourceForemanOrganizationDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
++	log.Tracef("resource_foreman_organization.go#Delete")
++
++	client := meta.(*api.Client)
++	o := buildForemanOrganization(d)
++
++	// NOTE(ALL): d.SetId("") is automatically called by terraform assuming delete
++	//   returns no errors
++
++	return diag.FromErr(api.CheckDeleted(d, client.DeleteOrganization(ctx, o.Id)))
++}
+diff --git a/foreman/resource_foreman_organization_test.go b/foreman/resource_foreman_organization_test.go
+new file mode 100644
+index 0000000..3b5a1a4
+--- /dev/null
++++ b/foreman/resource_foreman_organization_test.go
+@@ -0,0 +1,214 @@
++package foreman
++
++import (
++	"encoding/json"
++	"math/rand"
++	"net/http"
++	"reflect"
++	"strconv"
++	"testing"
++
++	tfrand "github.com/HanseMerkur/terraform-provider-utils/rand"
++	"github.com/masikrus/terraform-provider-foreman/foreman/api"
++
++	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
++	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
++)
++
++// -----------------------------------------------------------------------------
++// Test Helper Functions
++// -----------------------------------------------------------------------------
++
++const OrganizationsURI = api.FOREMAN_API_URL_PREFIX + "/organizations"
++const OrganizationsTestDataPath = "testdata/1.11/organizations"
++
++func ForemanOrganizationToInstanceState(obj api.ForemanOrganization) *terraform.InstanceState {
++	state := terraform.InstanceState{}
++	state.ID = strconv.Itoa(obj.Id)
++	attr := map[string]string{}
++	attr["name"] = obj.Name
++	attr["title"] = obj.Title
++	attr["description"] = obj.Description
++	attr["parent_id"] = strconv.Itoa(obj.ParentID)
++	state.Attributes = attr
++	return &state
++}
++
++func MockForemanOrganizationResourceData(s *terraform.InstanceState) *schema.ResourceData {
++	r := resourceForemanOrganization()
++	return r.Data(s)
++}
++
++func MockForemanOrganizationResourceDataFromFile(t *testing.T, path string) *schema.ResourceData {
++	var obj api.ForemanOrganization
++	ParseJSONFile(t, path, &obj)
++	s := ForemanOrganizationToInstanceState(obj)
++	return MockForemanOrganizationResourceData(s)
++}
++
++func RandForemanOrganization() api.ForemanOrganization {
++	obj := api.ForemanOrganization{}
++
++	fo := RandForemanObject()
++	obj.ForemanObject = fo
++	obj.Title = fo.Name
++	obj.Description = tfrand.String(20, tfrand.Lower)
++	obj.ParentID = rand.Intn(100)
++
++	return obj
++}
++
++func ForemanOrganizationResourceDataCompare(t *testing.T, r1 *schema.ResourceData, r2 *schema.ResourceData) {
++	if r1.Id() != r2.Id() {
++		t.Fatalf(
++			"ResourceData references differ in Id. [%s], [%s]",
++			r1.Id(),
++			r2.Id(),
++		)
++	}
++
++	m := map[string]schema.ValueType{}
++	r := resourceForemanOrganization()
++	for key, value := range r.Schema {
++		m[key] = value.Type
++	}
++
++	CompareResourceDataAttributes(t, m, r1, r2)
++}
++
++// -----------------------------------------------------------------------------
++// UnmarshalJSON
++// -----------------------------------------------------------------------------
++
++func TestOrganizationUnmarshalJSON_ForemanObject(t *testing.T) {
++	randObj := RandForemanObject()
++	randObjBytes, _ := json.Marshal(randObj)
++
++	var obj api.ForemanOrganization
++	jsonDecErr := json.Unmarshal(randObjBytes, &obj)
++	if jsonDecErr != nil {
++		t.Errorf(
++			"ForemanOrganization UnmarshalJSON could not decode base ForemanObject. "+
++				"Expected [nil] got [error]. Error value: [%s]",
++			jsonDecErr,
++		)
++	}
++
++	if !reflect.DeepEqual(obj.ForemanObject, randObj) {
++		t.Errorf(
++			"ForemanOrganization UnmarshalJSON did not properly decode base "+
++				"ForemanObject properties. Expected [%+v], got [%+v]",
++			randObj,
++			obj.ForemanObject,
++		)
++	}
++}
++
++// -----------------------------------------------------------------------------
++// setResourceDataFromForemanOrganization
++// -----------------------------------------------------------------------------
++
++func TestSetResourceDataFromForemanOrganization_Value(t *testing.T) {
++	expectedObj := RandForemanOrganization()
++	expectedState := ForemanOrganizationToInstanceState(expectedObj)
++	expectedResourceData := MockForemanOrganizationResourceData(expectedState)
++
++	actualObj := api.ForemanOrganization{}
++	actualState := ForemanOrganizationToInstanceState(actualObj)
++	actualResourceData := MockForemanOrganizationResourceData(actualState)
++
++	setResourceDataFromForemanOrganization(actualResourceData, &expectedObj)
++
++	ForemanOrganizationResourceDataCompare(t, actualResourceData, expectedResourceData)
++}
++
++// ----------------------------------------------------------------------------
++// Test Cases for the Unit Test Framework
++// ----------------------------------------------------------------------------
++
++func ResourceForemanOrganizationCorrectURLAndMethodTestCases(t *testing.T) []TestCaseCorrectURLAndMethod {
++	obj := api.ForemanOrganization{}
++	obj.Id = rand.Intn(100)
++	s := ForemanOrganizationToInstanceState(obj)
++	organizationsURIById := OrganizationsURI + "/" + strconv.Itoa(obj.Id)
++
++	return []TestCaseCorrectURLAndMethod{
++		{
++			TestCase: TestCase{
++				funcName:     "resourceForemanOrganizationRead",
++				crudFunc:     resourceForemanOrganizationRead,
++				resourceData: MockForemanOrganizationResourceData(s),
++			},
++			expectedURIs: []ExpectedUri{
++				{
++					expectedURI:    organizationsURIById,
++					expectedMethod: http.MethodGet,
++				},
++			},
++		},
++	}
++}
++
++func ResourceForemanOrganizationRequestDataEmptyTestCases(t *testing.T) []TestCase {
++	obj := api.ForemanOrganization{}
++	obj.Id = rand.Intn(100)
++	s := ForemanOrganizationToInstanceState(obj)
++
++	return []TestCase{
++		{
++			funcName:     "resourceForemanOrganizationRead",
++			crudFunc:     resourceForemanOrganizationRead,
++			resourceData: MockForemanOrganizationResourceData(s),
++		},
++	}
++}
++
++func ResourceForemanOrganizationStatusCodeTestCases(t *testing.T) []TestCase {
++	obj := api.ForemanOrganization{}
++	obj.Id = rand.Intn(100)
++	s := ForemanOrganizationToInstanceState(obj)
++
++	return []TestCase{
++		{
++			funcName:     "resourceForemanOrganizationRead",
++			crudFunc:     resourceForemanOrganizationRead,
++			resourceData: MockForemanOrganizationResourceData(s),
++		},
++	}
++}
++
++func ResourceForemanOrganizationEmptyResponseTestCases(t *testing.T) []TestCase {
++	obj := api.ForemanOrganization{}
++	obj.Id = rand.Intn(100)
++	s := ForemanOrganizationToInstanceState(obj)
++
++	return []TestCase{
++		{
++			funcName:     "resourceForemanOrganizationRead",
++			crudFunc:     resourceForemanOrganizationRead,
++			resourceData: MockForemanOrganizationResourceData(s),
++		},
++	}
++}
++
++func ResourceForemanOrganizationMockResponseTestCases(t *testing.T) []TestCaseMockResponse {
++	obj := RandForemanOrganization()
++	s := ForemanOrganizationToInstanceState(obj)
++
++	return []TestCaseMockResponse{
++		{
++			TestCase: TestCase{
++				funcName:     "resourceForemanOrganizationRead",
++				crudFunc:     resourceForemanOrganizationRead,
++				resourceData: MockForemanOrganizationResourceData(s),
++			},
++			responseFile: OrganizationsTestDataPath + "/read_response.json",
++			returnError:  false,
++			expectedResourceData: MockForemanOrganizationResourceDataFromFile(
++				t,
++				OrganizationsTestDataPath+"/read_response.json",
++			),
++			compareFunc: ForemanOrganizationResourceDataCompare,
++		},
++	}
++}
+diff --git a/foreman/testdata/1.11/locations/query_response_multi.json b/foreman/testdata/1.11/locations/query_response_multi.json
+new file mode 100644
+index 0000000..5ff130f
+--- /dev/null
++++ b/foreman/testdata/1.11/locations/query_response_multi.json
+@@ -0,0 +1,34 @@
++{
++  "total": 12,
++  "subtotal": 3,
++  "page": 1,
++  "per_page": 100,
++  "search": "name=\"ru_SBC\"",
++  "sort": {
++    "by": null,
++    "order": null
++  },
++  "results": [
++    {
++      "created_at": "2017-04-27 15:48:25 UTC",
++      "updated_at": "2017-04-27 15:48:25 UTC",
++      "name": "ru_SBC",
++      "title": "ru_SBC",
++      "id": 7
++    },
++    {
++      "created_at": "2018-05-03 19:30:12 UTC",
++      "updated_at": "2018-05-03 19:30:12 UTC",
++      "name": "ru_SBC",
++      "title": "Parent/ru_SBC",
++      "id": 15
++    },
++    {
++      "created_at": "2017-12-16 06:27:04 UTC",
++      "updated_at": "2017-12-16 06:27:04 UTC",
++      "name": "ru_MSK",
++      "title": "ru_MSK",
++      "id": 3
++    }
++  ]
++}
+diff --git a/foreman/testdata/1.11/locations/query_response_single.json b/foreman/testdata/1.11/locations/query_response_single.json
+new file mode 100644
+index 0000000..62b2558
+--- /dev/null
++++ b/foreman/testdata/1.11/locations/query_response_single.json
+@@ -0,0 +1,22 @@
++{
++  "total": 12,
++  "subtotal": 1,
++  "page": 1,
++  "per_page": 100,
++  "search": "name=\"ru_SBC\"",
++  "sort": {
++    "by": null,
++    "order": null
++  },
++  "results": [
++    {
++      "created_at": "2017-04-27 15:48:25 UTC",
++      "updated_at": "2017-04-27 15:48:25 UTC",
++      "name": "ru_SBC",
++      "title": "ru_SBC",
++      "description": "SBC location",
++      "parent_id": 2,
++      "id": 7
++    }
++  ]
++}
+diff --git a/foreman/testdata/1.11/locations/query_response_single_state.json b/foreman/testdata/1.11/locations/query_response_single_state.json
+new file mode 100644
+index 0000000..8887549
+--- /dev/null
++++ b/foreman/testdata/1.11/locations/query_response_single_state.json
+@@ -0,0 +1,9 @@
++{
++  "created_at": "2017-04-27 15:48:25 UTC",
++  "updated_at": "2017-04-27 15:48:25 UTC",
++  "name": "ru_SBC",
++  "title": "ru_SBC",
++  "description": "SBC location",
++  "parent_id": 2,
++  "id": 7
++}
+diff --git a/foreman/testdata/1.11/locations/read_response.json b/foreman/testdata/1.11/locations/read_response.json
+new file mode 100644
+index 0000000..13dd7f1
+--- /dev/null
++++ b/foreman/testdata/1.11/locations/read_response.json
+@@ -0,0 +1,10 @@
++{
++  "created_at": "2017-04-27 15:48:25 UTC",
++  "updated_at": "2017-04-27 15:48:25 UTC",
++  "name": "ru_SBC",
++  "title": "ru_SBC",
++  "description": "SBC location",
++  "parent_id": 2,
++  "parent_name": "Russia",
++  "id": 7
++}
+diff --git a/foreman/testdata/1.11/organizations/query_response_multi.json b/foreman/testdata/1.11/organizations/query_response_multi.json
+new file mode 100644
+index 0000000..d32e980
+--- /dev/null
++++ b/foreman/testdata/1.11/organizations/query_response_multi.json
+@@ -0,0 +1,27 @@
++{
++  "total": 4,
++  "subtotal": 2,
++  "page": 1,
++  "per_page": 100,
++  "search": "name=\"Okko\"",
++  "sort": {
++    "by": null,
++    "order": null
++  },
++  "results": [
++    {
++      "created_at": "2017-04-27 15:48:25 UTC",
++      "updated_at": "2017-04-27 15:48:25 UTC",
++      "name": "Okko",
++      "title": "Okko",
++      "id": 1
++    },
++    {
++      "created_at": "2018-05-03 19:30:12 UTC",
++      "updated_at": "2018-05-03 19:30:12 UTC",
++      "name": "Okko",
++      "title": "Parent/Okko",
++      "id": 8
++    }
++  ]
++}
+diff --git a/foreman/testdata/1.11/organizations/query_response_single.json b/foreman/testdata/1.11/organizations/query_response_single.json
+new file mode 100644
+index 0000000..93aa28d
+--- /dev/null
++++ b/foreman/testdata/1.11/organizations/query_response_single.json
+@@ -0,0 +1,22 @@
++{
++  "total": 4,
++  "subtotal": 1,
++  "page": 1,
++  "per_page": 100,
++  "search": "name=\"Okko\"",
++  "sort": {
++    "by": null,
++    "order": null
++  },
++  "results": [
++    {
++      "created_at": "2017-04-27 15:48:25 UTC",
++      "updated_at": "2017-04-27 15:48:25 UTC",
++      "name": "Okko",
++      "title": "Okko",
++      "description": "Okko organization",
++      "parent_id": 0,
++      "id": 1
++    }
++  ]
++}
+diff --git a/foreman/testdata/1.11/organizations/query_response_single_state.json b/foreman/testdata/1.11/organizations/query_response_single_state.json
+new file mode 100644
+index 0000000..d8ab08b
+--- /dev/null
++++ b/foreman/testdata/1.11/organizations/query_response_single_state.json
+@@ -0,0 +1,8 @@
++{
++  "created_at": "2017-04-27 15:48:25 UTC",
++  "updated_at": "2017-04-27 15:48:25 UTC",
++  "name": "Okko",
++  "title": "Okko",
++  "description": "Okko organization",
++  "id": 1
++}
+diff --git a/foreman/testdata/1.11/organizations/read_response.json b/foreman/testdata/1.11/organizations/read_response.json
+new file mode 100644
+index 0000000..d8ab08b
+--- /dev/null
++++ b/foreman/testdata/1.11/organizations/read_response.json
+@@ -0,0 +1,8 @@
++{
++  "created_at": "2017-04-27 15:48:25 UTC",
++  "updated_at": "2017-04-27 15:48:25 UTC",
++  "name": "Okko",
++  "title": "Okko",
++  "description": "Okko organization",
++  "id": 1
++}

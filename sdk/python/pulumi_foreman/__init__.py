@@ -28,9 +28,11 @@ from .get_katello_lifecycle_environment import *
 from .get_katello_product import *
 from .get_katello_repository import *
 from .get_katello_sync_plan import *
+from .get_location import *
 from .get_media import *
 from .get_model import *
 from .get_operatingsystem import *
+from .get_organization import *
 from .get_parameter import *
 from .get_partitiontable import *
 from .get_policy import *
@@ -56,9 +58,11 @@ from .katello_lifecycle_environment import *
 from .katello_product import *
 from .katello_repository import *
 from .katello_sync_plan import *
+from .location import *
 from .media import *
 from .model import *
 from .operatingsystem import *
+from .organization import *
 from .override_value import *
 from .parameter import *
 from .partitiontable import *
@@ -228,6 +232,14 @@ _utilities.register(
  },
  {
   "pkg": "foreman",
+  "mod": "index/location",
+  "fqn": "pulumi_foreman",
+  "classes": {
+   "foreman:index/location:Location": "Location"
+  }
+ },
+ {
+  "pkg": "foreman",
   "mod": "index/media",
   "fqn": "pulumi_foreman",
   "classes": {
@@ -248,6 +260,14 @@ _utilities.register(
   "fqn": "pulumi_foreman",
   "classes": {
    "foreman:index/operatingsystem:Operatingsystem": "Operatingsystem"
+  }
+ },
+ {
+  "pkg": "foreman",
+  "mod": "index/organization",
+  "fqn": "pulumi_foreman",
+  "classes": {
+   "foreman:index/organization:Organization": "Organization"
   }
  },
  {
