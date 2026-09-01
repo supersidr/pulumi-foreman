@@ -1,0 +1,61 @@
+diff --git a/foreman/api/host.go b/foreman/api/host.go
+--- a/foreman/api/host.go
++++ b/foreman/api/host.go
+@@ -58,8 +58,10 @@
+ 	// the shortname or the FQDN, but the "fqdn" field is presented to the user
+ 	// and must be consistent.
+ 
+-	// Whether or not to rebuild the host on reboot
+-	Build bool `json:"build"`
++	// Whether or not to rebuild the host on reboot.
++	// Pointer so omitempty can skip the field on updates that must not
++	// change Foreman's current build status.
++	Build *bool `json:"build,omitempty"`
+ 	// Current build status
+ 	// From Foreman: BUILT = 0, PENDING = 1, TOKEN_EXPIRED = 2, BUILD_FAILED = 3
+ 	BuildStatus int `json:"build_status"`
+diff --git a/foreman/resource_foreman_host.go b/foreman/resource_foreman_host.go
+--- a/foreman/resource_foreman_host.go
++++ b/foreman/resource_foreman_host.go
+@@ -879,7 +879,8 @@
+ 	host.OwnerType = d.Get("owner_type").(string)
+ 	host.ProvisionMethod = d.Get("provision_method").(string)
+ 	host.Managed = d.Get("managed").(bool)
+-	host.Build = d.Get("set_build_flag").(bool)
++	buildFlag := d.Get("set_build_flag").(bool)
++	host.Build = &buildFlag
+ 	host.Token = d.Get("token").(string)
+ 
+ 	ownerId := d.Get("owner_id").(int)
+@@ -1297,7 +1298,8 @@
+ 
+ 	// NOTE(ALL): Set the build flag to true on host create
+ 	if h.ProvisionMethod == "build" && h.Managed {
+-		h.Build = true
++		build := true
++		h.Build = &build
+ 	}
+ 	// Another way to set this flag is to use the "set_build_flag" argument in Terraform
+ 
+@@ -1408,6 +1410,13 @@
+ 
+ 	client := meta.(*api.Client)
+ 	h := buildForemanHost(d)
++
++	// Preserve Foreman's current build status unless set_build_flag changed.
++	// Sending build=true on unrelated updates (e.g. hostgroup) puts an already
++	// installed host back into "Pending installation".
++	if !d.HasChange("set_build_flag") {
++		h.Build = nil
++	}
+ 
+ 	log.Debugf("ForemanHost: [%+v]", h)
+ 
+@@ -1462,6 +1471,7 @@
+ 		d.HasChange("operatingsystem_id") ||
+ 		d.HasChange("interfaces_attributes") ||
+ 		d.HasChange("build") ||
++		d.HasChange("set_build_flag") ||
+ 		d.HasChange("puppet_class_ids") ||
+ 		d.HasChange("config_group_ids") ||
+ 		d.Get("managed") == false {

@@ -1482,8 +1482,7 @@
                 },
                 "hostgroupId": {
                     "type": "integer",
-                    "description": "ID of the hostgroup to assign to the host.\n",
-                    "willReplaceOnChanges": true
+                    "description": "ID of the hostgroup to assign to the host.\n"
                 },
                 "imageId": {
                     "type": "integer",
@@ -1658,8 +1657,7 @@
                     },
                     "hostgroupId": {
                         "type": "integer",
-                        "description": "ID of the hostgroup to assign to the host.\n",
-                        "willReplaceOnChanges": true
+                        "description": "ID of the hostgroup to assign to the host.\n"
                     },
                     "imageId": {
                         "type": "integer",

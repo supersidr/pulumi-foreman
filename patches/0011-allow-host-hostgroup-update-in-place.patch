@@ -1,0 +1,21 @@
+diff --git a/foreman/resource_foreman_host.go b/foreman/resource_foreman_host.go
+--- a/foreman/resource_foreman_host.go
++++ b/foreman/resource_foreman_host.go
+@@ -243,8 +243,7 @@ func resourceForemanHostV0() *schema.Resource {
+ 			"hostgroup_id": {
+ 				Type:         schema.TypeInt,
+ 				Computed:     true,
+ 				Optional:     true,
+-				ForceNew:     true,
+ 				ValidateFunc: validation.IntAtLeast(0),
+ 				Description:  "ID of the hostgroup to assign to the host.",
+ 			},
+@@ -624,8 +624,7 @@ func resourceForemanHost() *schema.Resource {
+ 			"hostgroup_id": {
+ 				Type:         schema.TypeInt,
+ 				Computed:     true,
+ 				Optional:     true,
+-				ForceNew:     true,
+ 				ValidateFunc: validation.IntAtLeast(0),
+ 				Description:  "ID of the hostgroup to assign to the host.",
+ 			},

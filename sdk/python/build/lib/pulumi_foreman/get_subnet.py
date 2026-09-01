@@ -26,7 +26,7 @@ class GetSubnetResult:
     """
     A collection of values returned by getSubnet.
     """
-    def __init__(__self__, bmc_id=None, boot_mode=None, description=None, dhcp_id=None, dns_primary=None, dns_secondary=None, domain_ids=None, from_=None, gateway=None, httpboot_id=None, id=None, ipam=None, mask=None, mtu=None, name=None, network=None, network_address=None, network_type=None, template_id=None, tftp_id=None, to=None, vlanid=None):
+    def __init__(__self__, bmc_id=None, boot_mode=None, description=None, dhcp_id=None, dns_id=None, dns_primary=None, dns_secondary=None, domain_ids=None, from_=None, gateway=None, httpboot_id=None, id=None, ipam=None, location_ids=None, mask=None, mtu=None, name=None, network=None, network_address=None, network_type=None, organization_ids=None, remote_execution_proxy_ids=None, template_id=None, tftp_id=None, to=None, vlanid=None):
         if bmc_id and not isinstance(bmc_id, int):
             raise TypeError("Expected argument 'bmc_id' to be a int")
         pulumi.set(__self__, "bmc_id", bmc_id)
@@ -39,6 +39,9 @@ class GetSubnetResult:
         if dhcp_id and not isinstance(dhcp_id, int):
             raise TypeError("Expected argument 'dhcp_id' to be a int")
         pulumi.set(__self__, "dhcp_id", dhcp_id)
+        if dns_id and not isinstance(dns_id, int):
+            raise TypeError("Expected argument 'dns_id' to be a int")
+        pulumi.set(__self__, "dns_id", dns_id)
         if dns_primary and not isinstance(dns_primary, str):
             raise TypeError("Expected argument 'dns_primary' to be a str")
         pulumi.set(__self__, "dns_primary", dns_primary)
@@ -63,6 +66,9 @@ class GetSubnetResult:
         if ipam and not isinstance(ipam, str):
             raise TypeError("Expected argument 'ipam' to be a str")
         pulumi.set(__self__, "ipam", ipam)
+        if location_ids and not isinstance(location_ids, list):
+            raise TypeError("Expected argument 'location_ids' to be a list")
+        pulumi.set(__self__, "location_ids", location_ids)
         if mask and not isinstance(mask, str):
             raise TypeError("Expected argument 'mask' to be a str")
         pulumi.set(__self__, "mask", mask)
@@ -81,6 +87,12 @@ class GetSubnetResult:
         if network_type and not isinstance(network_type, str):
             raise TypeError("Expected argument 'network_type' to be a str")
         pulumi.set(__self__, "network_type", network_type)
+        if organization_ids and not isinstance(organization_ids, list):
+            raise TypeError("Expected argument 'organization_ids' to be a list")
+        pulumi.set(__self__, "organization_ids", organization_ids)
+        if remote_execution_proxy_ids and not isinstance(remote_execution_proxy_ids, list):
+            raise TypeError("Expected argument 'remote_execution_proxy_ids' to be a list")
+        pulumi.set(__self__, "remote_execution_proxy_ids", remote_execution_proxy_ids)
         if template_id and not isinstance(template_id, int):
             raise TypeError("Expected argument 'template_id' to be a int")
         pulumi.set(__self__, "template_id", template_id)
@@ -113,6 +125,11 @@ class GetSubnetResult:
     @pulumi.getter(name="dhcpId")
     def dhcp_id(self) -> int:
         return pulumi.get(self, "dhcp_id")
+
+    @property
+    @pulumi.getter(name="dnsId")
+    def dns_id(self) -> int:
+        return pulumi.get(self, "dns_id")
 
     @property
     @pulumi.getter(name="dnsPrimary")
@@ -158,6 +175,11 @@ class GetSubnetResult:
         return pulumi.get(self, "ipam")
 
     @property
+    @pulumi.getter(name="locationIds")
+    def location_ids(self) -> Sequence[int]:
+        return pulumi.get(self, "location_ids")
+
+    @property
     @pulumi.getter
     def mask(self) -> str:
         return pulumi.get(self, "mask")
@@ -186,6 +208,16 @@ class GetSubnetResult:
     @pulumi.getter(name="networkType")
     def network_type(self) -> str:
         return pulumi.get(self, "network_type")
+
+    @property
+    @pulumi.getter(name="organizationIds")
+    def organization_ids(self) -> Sequence[int]:
+        return pulumi.get(self, "organization_ids")
+
+    @property
+    @pulumi.getter(name="remoteExecutionProxyIds")
+    def remote_execution_proxy_ids(self) -> Sequence[int]:
+        return pulumi.get(self, "remote_execution_proxy_ids")
 
     @property
     @pulumi.getter(name="templateId")
@@ -218,6 +250,7 @@ class AwaitableGetSubnetResult(GetSubnetResult):
             boot_mode=self.boot_mode,
             description=self.description,
             dhcp_id=self.dhcp_id,
+            dns_id=self.dns_id,
             dns_primary=self.dns_primary,
             dns_secondary=self.dns_secondary,
             domain_ids=self.domain_ids,
@@ -226,12 +259,15 @@ class AwaitableGetSubnetResult(GetSubnetResult):
             httpboot_id=self.httpboot_id,
             id=self.id,
             ipam=self.ipam,
+            location_ids=self.location_ids,
             mask=self.mask,
             mtu=self.mtu,
             name=self.name,
             network=self.network,
             network_address=self.network_address,
             network_type=self.network_type,
+            organization_ids=self.organization_ids,
+            remote_execution_proxy_ids=self.remote_execution_proxy_ids,
             template_id=self.template_id,
             tftp_id=self.tftp_id,
             to=self.to,
@@ -255,6 +291,7 @@ def get_subnet(name: Optional[str] = None,
         boot_mode=pulumi.get(__ret__, 'boot_mode'),
         description=pulumi.get(__ret__, 'description'),
         dhcp_id=pulumi.get(__ret__, 'dhcp_id'),
+        dns_id=pulumi.get(__ret__, 'dns_id'),
         dns_primary=pulumi.get(__ret__, 'dns_primary'),
         dns_secondary=pulumi.get(__ret__, 'dns_secondary'),
         domain_ids=pulumi.get(__ret__, 'domain_ids'),
@@ -263,12 +300,15 @@ def get_subnet(name: Optional[str] = None,
         httpboot_id=pulumi.get(__ret__, 'httpboot_id'),
         id=pulumi.get(__ret__, 'id'),
         ipam=pulumi.get(__ret__, 'ipam'),
+        location_ids=pulumi.get(__ret__, 'location_ids'),
         mask=pulumi.get(__ret__, 'mask'),
         mtu=pulumi.get(__ret__, 'mtu'),
         name=pulumi.get(__ret__, 'name'),
         network=pulumi.get(__ret__, 'network'),
         network_address=pulumi.get(__ret__, 'network_address'),
         network_type=pulumi.get(__ret__, 'network_type'),
+        organization_ids=pulumi.get(__ret__, 'organization_ids'),
+        remote_execution_proxy_ids=pulumi.get(__ret__, 'remote_execution_proxy_ids'),
         template_id=pulumi.get(__ret__, 'template_id'),
         tftp_id=pulumi.get(__ret__, 'tftp_id'),
         to=pulumi.get(__ret__, 'to'),
@@ -289,6 +329,7 @@ def get_subnet_output(name: Optional[pulumi.Input[Optional[str]]] = None,
         boot_mode=pulumi.get(__response__, 'boot_mode'),
         description=pulumi.get(__response__, 'description'),
         dhcp_id=pulumi.get(__response__, 'dhcp_id'),
+        dns_id=pulumi.get(__response__, 'dns_id'),
         dns_primary=pulumi.get(__response__, 'dns_primary'),
         dns_secondary=pulumi.get(__response__, 'dns_secondary'),
         domain_ids=pulumi.get(__response__, 'domain_ids'),
@@ -297,12 +338,15 @@ def get_subnet_output(name: Optional[pulumi.Input[Optional[str]]] = None,
         httpboot_id=pulumi.get(__response__, 'httpboot_id'),
         id=pulumi.get(__response__, 'id'),
         ipam=pulumi.get(__response__, 'ipam'),
+        location_ids=pulumi.get(__response__, 'location_ids'),
         mask=pulumi.get(__response__, 'mask'),
         mtu=pulumi.get(__response__, 'mtu'),
         name=pulumi.get(__response__, 'name'),
         network=pulumi.get(__response__, 'network'),
         network_address=pulumi.get(__response__, 'network_address'),
         network_type=pulumi.get(__response__, 'network_type'),
+        organization_ids=pulumi.get(__response__, 'organization_ids'),
+        remote_execution_proxy_ids=pulumi.get(__response__, 'remote_execution_proxy_ids'),
         template_id=pulumi.get(__response__, 'template_id'),
         tftp_id=pulumi.get(__response__, 'tftp_id'),
         to=pulumi.get(__response__, 'to'),

@@ -26,9 +26,11 @@ pulumi_foreman/get_katello_lifecycle_environment.py
 pulumi_foreman/get_katello_product.py
 pulumi_foreman/get_katello_repository.py
 pulumi_foreman/get_katello_sync_plan.py
+pulumi_foreman/get_location.py
 pulumi_foreman/get_media.py
 pulumi_foreman/get_model.py
 pulumi_foreman/get_operatingsystem.py
+pulumi_foreman/get_organization.py
 pulumi_foreman/get_parameter.py
 pulumi_foreman/get_partitiontable.py
 pulumi_foreman/get_policy.py
@@ -54,9 +56,11 @@ pulumi_foreman/katello_lifecycle_environment.py
 pulumi_foreman/katello_product.py
 pulumi_foreman/katello_repository.py
 pulumi_foreman/katello_sync_plan.py
+pulumi_foreman/location.py
 pulumi_foreman/media.py
 pulumi_foreman/model.py
 pulumi_foreman/operatingsystem.py
+pulumi_foreman/organization.py
 pulumi_foreman/outputs.py
 pulumi_foreman/override_value.py
 pulumi_foreman/parameter.py

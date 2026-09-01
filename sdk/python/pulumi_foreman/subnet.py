@@ -25,21 +25,21 @@ class SubnetArgs:
                  boot_mode: Optional[pulumi.Input[str]] = None,
                  description: Optional[pulumi.Input[str]] = None,
                  dhcp_id: Optional[pulumi.Input[int]] = None,
-            dns_id: Optional[pulumi.Input[int]] = None,
+                 dns_id: Optional[pulumi.Input[int]] = None,
                  dns_primary: Optional[pulumi.Input[str]] = None,
                  dns_secondary: Optional[pulumi.Input[str]] = None,
                  domain_ids: Optional[pulumi.Input[Sequence[pulumi.Input[int]]]] = None,
-                 location_ids: Optional[pulumi.Input[Sequence[pulumi.Input[int]]]] = None,
-                 organization_ids: Optional[pulumi.Input[Sequence[pulumi.Input[int]]]] = None,
-                 remote_execution_proxy_ids: Optional[pulumi.Input[Sequence[pulumi.Input[int]]]] = None,
                  from_: Optional[pulumi.Input[str]] = None,
                  gateway: Optional[pulumi.Input[str]] = None,
                  httpboot_id: Optional[pulumi.Input[int]] = None,
                  ipam: Optional[pulumi.Input[str]] = None,
+                 location_ids: Optional[pulumi.Input[Sequence[pulumi.Input[int]]]] = None,
                  mtu: Optional[pulumi.Input[int]] = None,
                  name: Optional[pulumi.Input[str]] = None,
                  network_address: Optional[pulumi.Input[str]] = None,
                  network_type: Optional[pulumi.Input[str]] = None,
+                 organization_ids: Optional[pulumi.Input[Sequence[pulumi.Input[int]]]] = None,
+                 remote_execution_proxy_ids: Optional[pulumi.Input[Sequence[pulumi.Input[int]]]] = None,
                  template_id: Optional[pulumi.Input[int]] = None,
                  tftp_id: Optional[pulumi.Input[int]] = None,
                  to: Optional[pulumi.Input[str]] = None,
@@ -56,17 +56,17 @@ class SubnetArgs:
         :param pulumi.Input[str] dns_primary: Primary DNS server for this subnet.
         :param pulumi.Input[str] dns_secondary: Secondary DNS sever for this subnet.
         :param pulumi.Input[Sequence[pulumi.Input[int]]] domain_ids: Domains in which this subnet is part
-        :param pulumi.Input[Sequence[pulumi.Input[int]]] location_ids: Locations to assign this subnet to
-        :param pulumi.Input[Sequence[pulumi.Input[int]]] organization_ids: Organizations to assign this subnet to
-        :param pulumi.Input[Sequence[pulumi.Input[int]]] remote_execution_proxy_ids: Remote Execution Proxy IDs to use within this subnet
         :param pulumi.Input[str] from_: Start IP address for IP auto suggestion.
         :param pulumi.Input[str] gateway: Gateway server to use when connecting/communicating to anything not on the same network.
         :param pulumi.Input[int] httpboot_id: HTTPBoot Proxy ID to use within this subnet
         :param pulumi.Input[str] ipam: IP address auto-suggestion for this subnet. Valid values include: `"DHCP"`, `"Internal DB"`, `"Random DB"`,`"None"`.
+        :param pulumi.Input[Sequence[pulumi.Input[int]]] location_ids: Locations to assign this subnet to
         :param pulumi.Input[int] mtu: MTU value for the subnet
         :param pulumi.Input[str] name: Subnet name. @EXAMPLE "10.228.247.0 BO1"
         :param pulumi.Input[str] network_address: The Subnets CIDR in the format 169.254.0.0/16
         :param pulumi.Input[str] network_type: Type or protocol, IPv4 or IPv6, defaults to IPv4.
+        :param pulumi.Input[Sequence[pulumi.Input[int]]] organization_ids: Organizations to assign this subnet to
+        :param pulumi.Input[Sequence[pulumi.Input[int]]] remote_execution_proxy_ids: Remote Execution Proxy IDs to use within this subnet
         :param pulumi.Input[int] template_id: Template HTTP(S) Proxy ID to use within this subnet
         :param pulumi.Input[int] tftp_id: TFTP Proxy ID to use within this subnet
         :param pulumi.Input[str] to: Ending IP address for IP auto suggestion.
@@ -90,12 +90,6 @@ class SubnetArgs:
             pulumi.set(__self__, "dns_secondary", dns_secondary)
         if domain_ids is not None:
             pulumi.set(__self__, "domain_ids", domain_ids)
-        if location_ids is not None:
-            pulumi.set(__self__, "location_ids", location_ids)
-        if organization_ids is not None:
-            pulumi.set(__self__, "organization_ids", organization_ids)
-        if remote_execution_proxy_ids is not None:
-            pulumi.set(__self__, "remote_execution_proxy_ids", remote_execution_proxy_ids)
         if from_ is not None:
             pulumi.set(__self__, "from_", from_)
         if gateway is not None:
@@ -104,6 +98,8 @@ class SubnetArgs:
             pulumi.set(__self__, "httpboot_id", httpboot_id)
         if ipam is not None:
             pulumi.set(__self__, "ipam", ipam)
+        if location_ids is not None:
+            pulumi.set(__self__, "location_ids", location_ids)
         if mtu is not None:
             pulumi.set(__self__, "mtu", mtu)
         if name is not None:
@@ -112,6 +108,10 @@ class SubnetArgs:
             pulumi.set(__self__, "network_address", network_address)
         if network_type is not None:
             pulumi.set(__self__, "network_type", network_type)
+        if organization_ids is not None:
+            pulumi.set(__self__, "organization_ids", organization_ids)
+        if remote_execution_proxy_ids is not None:
+            pulumi.set(__self__, "remote_execution_proxy_ids", remote_execution_proxy_ids)
         if template_id is not None:
             pulumi.set(__self__, "template_id", template_id)
         if tftp_id is not None:
@@ -205,7 +205,6 @@ class SubnetArgs:
     def dns_id(self, value: Optional[pulumi.Input[int]]):
         pulumi.set(self, "dns_id", value)
 
-
     @property
     @pulumi.getter(name="dnsPrimary")
     def dns_primary(self) -> Optional[pulumi.Input[str]]:
@@ -241,43 +240,6 @@ class SubnetArgs:
     @domain_ids.setter
     def domain_ids(self, value: Optional[pulumi.Input[Sequence[pulumi.Input[int]]]]):
         pulumi.set(self, "domain_ids", value)
-
-    @property
-    @pulumi.getter(name="locationIds")
-    def location_ids(self) -> Optional[pulumi.Input[Sequence[pulumi.Input[int]]]]:
-        """
-        Locations to assign this subnet to
-        """
-        return pulumi.get(self, "location_ids")
-
-    @location_ids.setter
-    def location_ids(self, value: Optional[pulumi.Input[Sequence[pulumi.Input[int]]]]):
-        pulumi.set(self, "location_ids", value)
-
-    @property
-    @pulumi.getter(name="organizationIds")
-    def organization_ids(self) -> Optional[pulumi.Input[Sequence[pulumi.Input[int]]]]:
-        """
-        Organizations to assign this subnet to
-        """
-        return pulumi.get(self, "organization_ids")
-
-    @organization_ids.setter
-    def organization_ids(self, value: Optional[pulumi.Input[Sequence[pulumi.Input[int]]]]):
-        pulumi.set(self, "organization_ids", value)
-
-    @property
-    @pulumi.getter(name="remoteExecutionProxyIds")
-    def remote_execution_proxy_ids(self) -> Optional[pulumi.Input[Sequence[pulumi.Input[int]]]]:
-        """
-        Remote Execution Proxy IDs to use within this subnet
-        """
-        return pulumi.get(self, "remote_execution_proxy_ids")
-
-    @remote_execution_proxy_ids.setter
-    def remote_execution_proxy_ids(self, value: Optional[pulumi.Input[Sequence[pulumi.Input[int]]]]):
-        pulumi.set(self, "remote_execution_proxy_ids", value)
-
 
     @property
     @pulumi.getter(name="from")
@@ -328,6 +290,18 @@ class SubnetArgs:
         pulumi.set(self, "ipam", value)
 
     @property
+    @pulumi.getter(name="locationIds")
+    def location_ids(self) -> Optional[pulumi.Input[Sequence[pulumi.Input[int]]]]:
+        """
+        Locations to assign this subnet to
+        """
+        return pulumi.get(self, "location_ids")
+
+    @location_ids.setter
+    def location_ids(self, value: Optional[pulumi.Input[Sequence[pulumi.Input[int]]]]):
+        pulumi.set(self, "location_ids", value)
+
+    @property
     @pulumi.getter
     def mtu(self) -> Optional[pulumi.Input[int]]:
         """
@@ -374,6 +348,30 @@ class SubnetArgs:
     @network_type.setter
     def network_type(self, value: Optional[pulumi.Input[str]]):
         pulumi.set(self, "network_type", value)
+
+    @property
+    @pulumi.getter(name="organizationIds")
+    def organization_ids(self) -> Optional[pulumi.Input[Sequence[pulumi.Input[int]]]]:
+        """
+        Organizations to assign this subnet to
+        """
+        return pulumi.get(self, "organization_ids")
+
+    @organization_ids.setter
+    def organization_ids(self, value: Optional[pulumi.Input[Sequence[pulumi.Input[int]]]]):
+        pulumi.set(self, "organization_ids", value)
+
+    @property
+    @pulumi.getter(name="remoteExecutionProxyIds")
+    def remote_execution_proxy_ids(self) -> Optional[pulumi.Input[Sequence[pulumi.Input[int]]]]:
+        """
+        Remote Execution Proxy IDs to use within this subnet
+        """
+        return pulumi.get(self, "remote_execution_proxy_ids")
+
+    @remote_execution_proxy_ids.setter
+    def remote_execution_proxy_ids(self, value: Optional[pulumi.Input[Sequence[pulumi.Input[int]]]]):
+        pulumi.set(self, "remote_execution_proxy_ids", value)
 
     @property
     @pulumi.getter(name="templateId")
@@ -432,23 +430,23 @@ class _SubnetState:
                  boot_mode: Optional[pulumi.Input[str]] = None,
                  description: Optional[pulumi.Input[str]] = None,
                  dhcp_id: Optional[pulumi.Input[int]] = None,
-            dns_id: Optional[pulumi.Input[int]] = None,
+                 dns_id: Optional[pulumi.Input[int]] = None,
                  dns_primary: Optional[pulumi.Input[str]] = None,
                  dns_secondary: Optional[pulumi.Input[str]] = None,
                  domain_ids: Optional[pulumi.Input[Sequence[pulumi.Input[int]]]] = None,
-                 location_ids: Optional[pulumi.Input[Sequence[pulumi.Input[int]]]] = None,
-                 organization_ids: Optional[pulumi.Input[Sequence[pulumi.Input[int]]]] = None,
-                 remote_execution_proxy_ids: Optional[pulumi.Input[Sequence[pulumi.Input[int]]]] = None,
                  from_: Optional[pulumi.Input[str]] = None,
                  gateway: Optional[pulumi.Input[str]] = None,
                  httpboot_id: Optional[pulumi.Input[int]] = None,
                  ipam: Optional[pulumi.Input[str]] = None,
+                 location_ids: Optional[pulumi.Input[Sequence[pulumi.Input[int]]]] = None,
                  mask: Optional[pulumi.Input[str]] = None,
                  mtu: Optional[pulumi.Input[int]] = None,
                  name: Optional[pulumi.Input[str]] = None,
                  network: Optional[pulumi.Input[str]] = None,
                  network_address: Optional[pulumi.Input[str]] = None,
                  network_type: Optional[pulumi.Input[str]] = None,
+                 organization_ids: Optional[pulumi.Input[Sequence[pulumi.Input[int]]]] = None,
+                 remote_execution_proxy_ids: Optional[pulumi.Input[Sequence[pulumi.Input[int]]]] = None,
                  template_id: Optional[pulumi.Input[int]] = None,
                  tftp_id: Optional[pulumi.Input[int]] = None,
                  to: Optional[pulumi.Input[str]] = None,
@@ -464,19 +462,19 @@ class _SubnetState:
         :param pulumi.Input[str] dns_primary: Primary DNS server for this subnet.
         :param pulumi.Input[str] dns_secondary: Secondary DNS sever for this subnet.
         :param pulumi.Input[Sequence[pulumi.Input[int]]] domain_ids: Domains in which this subnet is part
-        :param pulumi.Input[Sequence[pulumi.Input[int]]] location_ids: Locations to assign this subnet to
-        :param pulumi.Input[Sequence[pulumi.Input[int]]] organization_ids: Organizations to assign this subnet to
-        :param pulumi.Input[Sequence[pulumi.Input[int]]] remote_execution_proxy_ids: Remote Execution Proxy IDs to use within this subnet
         :param pulumi.Input[str] from_: Start IP address for IP auto suggestion.
         :param pulumi.Input[str] gateway: Gateway server to use when connecting/communicating to anything not on the same network.
         :param pulumi.Input[int] httpboot_id: HTTPBoot Proxy ID to use within this subnet
         :param pulumi.Input[str] ipam: IP address auto-suggestion for this subnet. Valid values include: `"DHCP"`, `"Internal DB"`, `"Random DB"`,`"None"`.
+        :param pulumi.Input[Sequence[pulumi.Input[int]]] location_ids: Locations to assign this subnet to
         :param pulumi.Input[str] mask: Netmask for this subnet. @EXAMPLE "255.255.255.0"
         :param pulumi.Input[int] mtu: MTU value for the subnet
         :param pulumi.Input[str] name: Subnet name. @EXAMPLE "10.228.247.0 BO1"
         :param pulumi.Input[str] network: Subnet network. @EXAMPLE "10.228.247.0"
         :param pulumi.Input[str] network_address: The Subnets CIDR in the format 169.254.0.0/16
         :param pulumi.Input[str] network_type: Type or protocol, IPv4 or IPv6, defaults to IPv4.
+        :param pulumi.Input[Sequence[pulumi.Input[int]]] organization_ids: Organizations to assign this subnet to
+        :param pulumi.Input[Sequence[pulumi.Input[int]]] remote_execution_proxy_ids: Remote Execution Proxy IDs to use within this subnet
         :param pulumi.Input[int] template_id: Template HTTP(S) Proxy ID to use within this subnet
         :param pulumi.Input[int] tftp_id: TFTP Proxy ID to use within this subnet
         :param pulumi.Input[str] to: Ending IP address for IP auto suggestion.
@@ -500,12 +498,6 @@ class _SubnetState:
             pulumi.set(__self__, "dns_secondary", dns_secondary)
         if domain_ids is not None:
             pulumi.set(__self__, "domain_ids", domain_ids)
-        if location_ids is not None:
-            pulumi.set(__self__, "location_ids", location_ids)
-        if organization_ids is not None:
-            pulumi.set(__self__, "organization_ids", organization_ids)
-        if remote_execution_proxy_ids is not None:
-            pulumi.set(__self__, "remote_execution_proxy_ids", remote_execution_proxy_ids)
         if from_ is not None:
             pulumi.set(__self__, "from_", from_)
         if gateway is not None:
@@ -514,6 +506,8 @@ class _SubnetState:
             pulumi.set(__self__, "httpboot_id", httpboot_id)
         if ipam is not None:
             pulumi.set(__self__, "ipam", ipam)
+        if location_ids is not None:
+            pulumi.set(__self__, "location_ids", location_ids)
         if mask is not None:
             pulumi.set(__self__, "mask", mask)
         if mtu is not None:
@@ -526,6 +520,10 @@ class _SubnetState:
             pulumi.set(__self__, "network_address", network_address)
         if network_type is not None:
             pulumi.set(__self__, "network_type", network_type)
+        if organization_ids is not None:
+            pulumi.set(__self__, "organization_ids", organization_ids)
+        if remote_execution_proxy_ids is not None:
+            pulumi.set(__self__, "remote_execution_proxy_ids", remote_execution_proxy_ids)
         if template_id is not None:
             pulumi.set(__self__, "template_id", template_id)
         if tftp_id is not None:
@@ -607,7 +605,6 @@ class _SubnetState:
     def dns_id(self, value: Optional[pulumi.Input[int]]):
         pulumi.set(self, "dns_id", value)
 
-
     @property
     @pulumi.getter(name="dnsPrimary")
     def dns_primary(self) -> Optional[pulumi.Input[str]]:
@@ -643,43 +640,6 @@ class _SubnetState:
     @domain_ids.setter
     def domain_ids(self, value: Optional[pulumi.Input[Sequence[pulumi.Input[int]]]]):
         pulumi.set(self, "domain_ids", value)
-
-    @property
-    @pulumi.getter(name="locationIds")
-    def location_ids(self) -> Optional[pulumi.Input[Sequence[pulumi.Input[int]]]]:
-        """
-        Locations to assign this subnet to
-        """
-        return pulumi.get(self, "location_ids")
-
-    @location_ids.setter
-    def location_ids(self, value: Optional[pulumi.Input[Sequence[pulumi.Input[int]]]]):
-        pulumi.set(self, "location_ids", value)
-
-    @property
-    @pulumi.getter(name="organizationIds")
-    def organization_ids(self) -> Optional[pulumi.Input[Sequence[pulumi.Input[int]]]]:
-        """
-        Organizations to assign this subnet to
-        """
-        return pulumi.get(self, "organization_ids")
-
-    @organization_ids.setter
-    def organization_ids(self, value: Optional[pulumi.Input[Sequence[pulumi.Input[int]]]]):
-        pulumi.set(self, "organization_ids", value)
-
-    @property
-    @pulumi.getter(name="remoteExecutionProxyIds")
-    def remote_execution_proxy_ids(self) -> Optional[pulumi.Input[Sequence[pulumi.Input[int]]]]:
-        """
-        Remote Execution Proxy IDs to use within this subnet
-        """
-        return pulumi.get(self, "remote_execution_proxy_ids")
-
-    @remote_execution_proxy_ids.setter
-    def remote_execution_proxy_ids(self, value: Optional[pulumi.Input[Sequence[pulumi.Input[int]]]]):
-        pulumi.set(self, "remote_execution_proxy_ids", value)
-
 
     @property
     @pulumi.getter(name="from")
@@ -728,6 +688,18 @@ class _SubnetState:
     @ipam.setter
     def ipam(self, value: Optional[pulumi.Input[str]]):
         pulumi.set(self, "ipam", value)
+
+    @property
+    @pulumi.getter(name="locationIds")
+    def location_ids(self) -> Optional[pulumi.Input[Sequence[pulumi.Input[int]]]]:
+        """
+        Locations to assign this subnet to
+        """
+        return pulumi.get(self, "location_ids")
+
+    @location_ids.setter
+    def location_ids(self, value: Optional[pulumi.Input[Sequence[pulumi.Input[int]]]]):
+        pulumi.set(self, "location_ids", value)
 
     @property
     @pulumi.getter
@@ -802,6 +774,30 @@ class _SubnetState:
         pulumi.set(self, "network_type", value)
 
     @property
+    @pulumi.getter(name="organizationIds")
+    def organization_ids(self) -> Optional[pulumi.Input[Sequence[pulumi.Input[int]]]]:
+        """
+        Organizations to assign this subnet to
+        """
+        return pulumi.get(self, "organization_ids")
+
+    @organization_ids.setter
+    def organization_ids(self, value: Optional[pulumi.Input[Sequence[pulumi.Input[int]]]]):
+        pulumi.set(self, "organization_ids", value)
+
+    @property
+    @pulumi.getter(name="remoteExecutionProxyIds")
+    def remote_execution_proxy_ids(self) -> Optional[pulumi.Input[Sequence[pulumi.Input[int]]]]:
+        """
+        Remote Execution Proxy IDs to use within this subnet
+        """
+        return pulumi.get(self, "remote_execution_proxy_ids")
+
+    @remote_execution_proxy_ids.setter
+    def remote_execution_proxy_ids(self, value: Optional[pulumi.Input[Sequence[pulumi.Input[int]]]]):
+        pulumi.set(self, "remote_execution_proxy_ids", value)
+
+    @property
     @pulumi.getter(name="templateId")
     def template_id(self) -> Optional[pulumi.Input[int]]:
         """
@@ -859,23 +855,23 @@ class Subnet(pulumi.CustomResource):
                  boot_mode: Optional[pulumi.Input[str]] = None,
                  description: Optional[pulumi.Input[str]] = None,
                  dhcp_id: Optional[pulumi.Input[int]] = None,
-            dns_id: Optional[pulumi.Input[int]] = None,
+                 dns_id: Optional[pulumi.Input[int]] = None,
                  dns_primary: Optional[pulumi.Input[str]] = None,
                  dns_secondary: Optional[pulumi.Input[str]] = None,
                  domain_ids: Optional[pulumi.Input[Sequence[pulumi.Input[int]]]] = None,
-                 location_ids: Optional[pulumi.Input[Sequence[pulumi.Input[int]]]] = None,
-                 organization_ids: Optional[pulumi.Input[Sequence[pulumi.Input[int]]]] = None,
-                 remote_execution_proxy_ids: Optional[pulumi.Input[Sequence[pulumi.Input[int]]]] = None,
                  from_: Optional[pulumi.Input[str]] = None,
                  gateway: Optional[pulumi.Input[str]] = None,
                  httpboot_id: Optional[pulumi.Input[int]] = None,
                  ipam: Optional[pulumi.Input[str]] = None,
+                 location_ids: Optional[pulumi.Input[Sequence[pulumi.Input[int]]]] = None,
                  mask: Optional[pulumi.Input[str]] = None,
                  mtu: Optional[pulumi.Input[int]] = None,
                  name: Optional[pulumi.Input[str]] = None,
                  network: Optional[pulumi.Input[str]] = None,
                  network_address: Optional[pulumi.Input[str]] = None,
                  network_type: Optional[pulumi.Input[str]] = None,
+                 organization_ids: Optional[pulumi.Input[Sequence[pulumi.Input[int]]]] = None,
+                 remote_execution_proxy_ids: Optional[pulumi.Input[Sequence[pulumi.Input[int]]]] = None,
                  template_id: Optional[pulumi.Input[int]] = None,
                  tftp_id: Optional[pulumi.Input[int]] = None,
                  to: Optional[pulumi.Input[str]] = None,
@@ -893,19 +889,19 @@ class Subnet(pulumi.CustomResource):
         :param pulumi.Input[str] dns_primary: Primary DNS server for this subnet.
         :param pulumi.Input[str] dns_secondary: Secondary DNS sever for this subnet.
         :param pulumi.Input[Sequence[pulumi.Input[int]]] domain_ids: Domains in which this subnet is part
-        :param pulumi.Input[Sequence[pulumi.Input[int]]] location_ids: Locations to assign this subnet to
-        :param pulumi.Input[Sequence[pulumi.Input[int]]] organization_ids: Organizations to assign this subnet to
-        :param pulumi.Input[Sequence[pulumi.Input[int]]] remote_execution_proxy_ids: Remote Execution Proxy IDs to use within this subnet
         :param pulumi.Input[str] from_: Start IP address for IP auto suggestion.
         :param pulumi.Input[str] gateway: Gateway server to use when connecting/communicating to anything not on the same network.
         :param pulumi.Input[int] httpboot_id: HTTPBoot Proxy ID to use within this subnet
         :param pulumi.Input[str] ipam: IP address auto-suggestion for this subnet. Valid values include: `"DHCP"`, `"Internal DB"`, `"Random DB"`,`"None"`.
+        :param pulumi.Input[Sequence[pulumi.Input[int]]] location_ids: Locations to assign this subnet to
         :param pulumi.Input[str] mask: Netmask for this subnet. @EXAMPLE "255.255.255.0"
         :param pulumi.Input[int] mtu: MTU value for the subnet
         :param pulumi.Input[str] name: Subnet name. @EXAMPLE "10.228.247.0 BO1"
         :param pulumi.Input[str] network: Subnet network. @EXAMPLE "10.228.247.0"
         :param pulumi.Input[str] network_address: The Subnets CIDR in the format 169.254.0.0/16
         :param pulumi.Input[str] network_type: Type or protocol, IPv4 or IPv6, defaults to IPv4.
+        :param pulumi.Input[Sequence[pulumi.Input[int]]] organization_ids: Organizations to assign this subnet to
+        :param pulumi.Input[Sequence[pulumi.Input[int]]] remote_execution_proxy_ids: Remote Execution Proxy IDs to use within this subnet
         :param pulumi.Input[int] template_id: Template HTTP(S) Proxy ID to use within this subnet
         :param pulumi.Input[int] tftp_id: TFTP Proxy ID to use within this subnet
         :param pulumi.Input[str] to: Ending IP address for IP auto suggestion.
@@ -938,23 +934,23 @@ class Subnet(pulumi.CustomResource):
                  boot_mode: Optional[pulumi.Input[str]] = None,
                  description: Optional[pulumi.Input[str]] = None,
                  dhcp_id: Optional[pulumi.Input[int]] = None,
-            dns_id: Optional[pulumi.Input[int]] = None,
+                 dns_id: Optional[pulumi.Input[int]] = None,
                  dns_primary: Optional[pulumi.Input[str]] = None,
                  dns_secondary: Optional[pulumi.Input[str]] = None,
                  domain_ids: Optional[pulumi.Input[Sequence[pulumi.Input[int]]]] = None,
-                 location_ids: Optional[pulumi.Input[Sequence[pulumi.Input[int]]]] = None,
-                 organization_ids: Optional[pulumi.Input[Sequence[pulumi.Input[int]]]] = None,
-                 remote_execution_proxy_ids: Optional[pulumi.Input[Sequence[pulumi.Input[int]]]] = None,
                  from_: Optional[pulumi.Input[str]] = None,
                  gateway: Optional[pulumi.Input[str]] = None,
                  httpboot_id: Optional[pulumi.Input[int]] = None,
                  ipam: Optional[pulumi.Input[str]] = None,
+                 location_ids: Optional[pulumi.Input[Sequence[pulumi.Input[int]]]] = None,
                  mask: Optional[pulumi.Input[str]] = None,
                  mtu: Optional[pulumi.Input[int]] = None,
                  name: Optional[pulumi.Input[str]] = None,
                  network: Optional[pulumi.Input[str]] = None,
                  network_address: Optional[pulumi.Input[str]] = None,
                  network_type: Optional[pulumi.Input[str]] = None,
+                 organization_ids: Optional[pulumi.Input[Sequence[pulumi.Input[int]]]] = None,
+                 remote_execution_proxy_ids: Optional[pulumi.Input[Sequence[pulumi.Input[int]]]] = None,
                  template_id: Optional[pulumi.Input[int]] = None,
                  tftp_id: Optional[pulumi.Input[int]] = None,
                  to: Optional[pulumi.Input[str]] = None,
@@ -976,13 +972,11 @@ class Subnet(pulumi.CustomResource):
             __props__.__dict__["dns_primary"] = dns_primary
             __props__.__dict__["dns_secondary"] = dns_secondary
             __props__.__dict__["domain_ids"] = domain_ids
-            __props__.__dict__["location_ids"] = location_ids
-            __props__.__dict__["organization_ids"] = organization_ids
-            __props__.__dict__["remote_execution_proxy_ids"] = remote_execution_proxy_ids
             __props__.__dict__["from_"] = from_
             __props__.__dict__["gateway"] = gateway
             __props__.__dict__["httpboot_id"] = httpboot_id
             __props__.__dict__["ipam"] = ipam
+            __props__.__dict__["location_ids"] = location_ids
             if mask is None and not opts.urn:
                 raise TypeError("Missing required property 'mask'")
             __props__.__dict__["mask"] = mask
@@ -993,6 +987,8 @@ class Subnet(pulumi.CustomResource):
             __props__.__dict__["network"] = network
             __props__.__dict__["network_address"] = network_address
             __props__.__dict__["network_type"] = network_type
+            __props__.__dict__["organization_ids"] = organization_ids
+            __props__.__dict__["remote_execution_proxy_ids"] = remote_execution_proxy_ids
             __props__.__dict__["template_id"] = template_id
             __props__.__dict__["tftp_id"] = tftp_id
             __props__.__dict__["to"] = to
@@ -1017,19 +1013,19 @@ class Subnet(pulumi.CustomResource):
             dns_primary: Optional[pulumi.Input[str]] = None,
             dns_secondary: Optional[pulumi.Input[str]] = None,
             domain_ids: Optional[pulumi.Input[Sequence[pulumi.Input[int]]]] = None,
-            location_ids: Optional[pulumi.Input[Sequence[pulumi.Input[int]]]] = None,
-            organization_ids: Optional[pulumi.Input[Sequence[pulumi.Input[int]]]] = None,
-            remote_execution_proxy_ids: Optional[pulumi.Input[Sequence[pulumi.Input[int]]]] = None,
             from_: Optional[pulumi.Input[str]] = None,
             gateway: Optional[pulumi.Input[str]] = None,
             httpboot_id: Optional[pulumi.Input[int]] = None,
             ipam: Optional[pulumi.Input[str]] = None,
+            location_ids: Optional[pulumi.Input[Sequence[pulumi.Input[int]]]] = None,
             mask: Optional[pulumi.Input[str]] = None,
             mtu: Optional[pulumi.Input[int]] = None,
             name: Optional[pulumi.Input[str]] = None,
             network: Optional[pulumi.Input[str]] = None,
             network_address: Optional[pulumi.Input[str]] = None,
             network_type: Optional[pulumi.Input[str]] = None,
+            organization_ids: Optional[pulumi.Input[Sequence[pulumi.Input[int]]]] = None,
+            remote_execution_proxy_ids: Optional[pulumi.Input[Sequence[pulumi.Input[int]]]] = None,
             template_id: Optional[pulumi.Input[int]] = None,
             tftp_id: Optional[pulumi.Input[int]] = None,
             to: Optional[pulumi.Input[str]] = None,
@@ -1050,19 +1046,19 @@ class Subnet(pulumi.CustomResource):
         :param pulumi.Input[str] dns_primary: Primary DNS server for this subnet.
         :param pulumi.Input[str] dns_secondary: Secondary DNS sever for this subnet.
         :param pulumi.Input[Sequence[pulumi.Input[int]]] domain_ids: Domains in which this subnet is part
-        :param pulumi.Input[Sequence[pulumi.Input[int]]] location_ids: Locations to assign this subnet to
-        :param pulumi.Input[Sequence[pulumi.Input[int]]] organization_ids: Organizations to assign this subnet to
-        :param pulumi.Input[Sequence[pulumi.Input[int]]] remote_execution_proxy_ids: Remote Execution Proxy IDs to use within this subnet
         :param pulumi.Input[str] from_: Start IP address for IP auto suggestion.
         :param pulumi.Input[str] gateway: Gateway server to use when connecting/communicating to anything not on the same network.
         :param pulumi.Input[int] httpboot_id: HTTPBoot Proxy ID to use within this subnet
         :param pulumi.Input[str] ipam: IP address auto-suggestion for this subnet. Valid values include: `"DHCP"`, `"Internal DB"`, `"Random DB"`,`"None"`.
+        :param pulumi.Input[Sequence[pulumi.Input[int]]] location_ids: Locations to assign this subnet to
         :param pulumi.Input[str] mask: Netmask for this subnet. @EXAMPLE "255.255.255.0"
         :param pulumi.Input[int] mtu: MTU value for the subnet
         :param pulumi.Input[str] name: Subnet name. @EXAMPLE "10.228.247.0 BO1"
         :param pulumi.Input[str] network: Subnet network. @EXAMPLE "10.228.247.0"
         :param pulumi.Input[str] network_address: The Subnets CIDR in the format 169.254.0.0/16
         :param pulumi.Input[str] network_type: Type or protocol, IPv4 or IPv6, defaults to IPv4.
+        :param pulumi.Input[Sequence[pulumi.Input[int]]] organization_ids: Organizations to assign this subnet to
+        :param pulumi.Input[Sequence[pulumi.Input[int]]] remote_execution_proxy_ids: Remote Execution Proxy IDs to use within this subnet
         :param pulumi.Input[int] template_id: Template HTTP(S) Proxy ID to use within this subnet
         :param pulumi.Input[int] tftp_id: TFTP Proxy ID to use within this subnet
         :param pulumi.Input[str] to: Ending IP address for IP auto suggestion.
@@ -1081,19 +1077,19 @@ class Subnet(pulumi.CustomResource):
         __props__.__dict__["dns_primary"] = dns_primary
         __props__.__dict__["dns_secondary"] = dns_secondary
         __props__.__dict__["domain_ids"] = domain_ids
-        __props__.__dict__["location_ids"] = location_ids
-        __props__.__dict__["organization_ids"] = organization_ids
-        __props__.__dict__["remote_execution_proxy_ids"] = remote_execution_proxy_ids
         __props__.__dict__["from_"] = from_
         __props__.__dict__["gateway"] = gateway
         __props__.__dict__["httpboot_id"] = httpboot_id
         __props__.__dict__["ipam"] = ipam
+        __props__.__dict__["location_ids"] = location_ids
         __props__.__dict__["mask"] = mask
         __props__.__dict__["mtu"] = mtu
         __props__.__dict__["name"] = name
         __props__.__dict__["network"] = network
         __props__.__dict__["network_address"] = network_address
         __props__.__dict__["network_type"] = network_type
+        __props__.__dict__["organization_ids"] = organization_ids
+        __props__.__dict__["remote_execution_proxy_ids"] = remote_execution_proxy_ids
         __props__.__dict__["template_id"] = template_id
         __props__.__dict__["tftp_id"] = tftp_id
         __props__.__dict__["to"] = to
@@ -1148,7 +1144,6 @@ class Subnet(pulumi.CustomResource):
         """
         return pulumi.get(self, "dns_id")
 
-
     @property
     @pulumi.getter(name="dnsPrimary")
     def dns_primary(self) -> pulumi.Output[Optional[str]]:
@@ -1172,31 +1167,6 @@ class Subnet(pulumi.CustomResource):
         Domains in which this subnet is part
         """
         return pulumi.get(self, "domain_ids")
-
-    @property
-    @pulumi.getter(name="locationIds")
-    def location_ids(self) -> pulumi.Output[Optional[Sequence[int]]]:
-        """
-        Locations to assign this subnet to
-        """
-        return pulumi.get(self, "location_ids")
-
-    @property
-    @pulumi.getter(name="organizationIds")
-    def organization_ids(self) -> pulumi.Output[Optional[Sequence[int]]]:
-        """
-        Organizations to assign this subnet to
-        """
-        return pulumi.get(self, "organization_ids")
-
-    @property
-    @pulumi.getter(name="remoteExecutionProxyIds")
-    def remote_execution_proxy_ids(self) -> pulumi.Output[Optional[Sequence[int]]]:
-        """
-        Remote Execution Proxy IDs to use within this subnet
-        """
-        return pulumi.get(self, "remote_execution_proxy_ids")
-
 
     @property
     @pulumi.getter(name="from")
@@ -1229,6 +1199,14 @@ class Subnet(pulumi.CustomResource):
         IP address auto-suggestion for this subnet. Valid values include: `"DHCP"`, `"Internal DB"`, `"Random DB"`,`"None"`.
         """
         return pulumi.get(self, "ipam")
+
+    @property
+    @pulumi.getter(name="locationIds")
+    def location_ids(self) -> pulumi.Output[Optional[Sequence[int]]]:
+        """
+        Locations to assign this subnet to
+        """
+        return pulumi.get(self, "location_ids")
 
     @property
     @pulumi.getter
@@ -1277,6 +1255,22 @@ class Subnet(pulumi.CustomResource):
         Type or protocol, IPv4 or IPv6, defaults to IPv4.
         """
         return pulumi.get(self, "network_type")
+
+    @property
+    @pulumi.getter(name="organizationIds")
+    def organization_ids(self) -> pulumi.Output[Optional[Sequence[int]]]:
+        """
+        Organizations to assign this subnet to
+        """
+        return pulumi.get(self, "organization_ids")
+
+    @property
+    @pulumi.getter(name="remoteExecutionProxyIds")
+    def remote_execution_proxy_ids(self) -> pulumi.Output[Optional[Sequence[int]]]:
+        """
+        Remote Execution Proxy IDs to use within this subnet
+        """
+        return pulumi.get(self, "remote_execution_proxy_ids")
 
     @property
     @pulumi.getter(name="templateId")
